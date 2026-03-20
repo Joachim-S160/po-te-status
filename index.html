@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Po/Te Candidate Molecules — Status</title>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;background:#f0f2f6;min-height:100vh;transition:background .15s}
+body.wrong-pw{background:#e74c3c!important;animation:shake .5s ease}
+@keyframes shake{0%,100%{transform:translateX(0)}15%,45%,75%{transform:translateX(-9px)}30%,60%,90%{transform:translateX(9px)}}
+
+/* ── Gate ── */
+#gate{position:fixed;inset:0;z-index:999;display:flex;align-items:center;justify-content:center;background:#1a1a2e}
+#gate-box{background:#fff;border-radius:14px;padding:40px 48px;max-width:380px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,.5);text-align:center}
+#gate-box h2{font-size:1.4rem;color:#1a1a2e;margin-bottom:6px}
+#gate-box p{font-size:.9rem;color:#777;margin-bottom:20px}
+#pw-input{width:100%;padding:10px 14px;border:2px solid #d0d0d0;border-radius:8px;font-size:1rem;outline:none;transition:border-color .2s}
+#pw-input:focus{border-color:#2980b9}
+#pw-submit{margin-top:12px;width:100%;padding:10px;border:none;border-radius:8px;background:#1a1a2e;color:#fff;font-size:1rem;font-weight:600;cursor:pointer;transition:background .2s}
+#pw-submit:hover{background:#2980b9}
+#pw-error{margin-top:10px;font-size:.85rem;color:#c0392b;min-height:1.2em}
+
+/* ── App ── */
+#app{display:none;max-width:1800px;margin:0 auto;padding:20px 12px 48px}
+header{text-align:center;margin-bottom:14px}
+#fig-title{font-size:clamp(1rem,2.2vw,1.55rem);font-weight:700;color:#1a1a2e}
+#fig-subtitle{font-size:.88rem;color:#888;font-style:italic;margin-top:4px}
+
+/* ── Toggle ── */
+#toggle-bar{display:flex;justify-content:center;margin:12px 0 18px}
+.toggle-btn{padding:9px 36px;font-size:.95rem;font-weight:600;border:2px solid #2980b9;background:#fff;color:#2980b9;cursor:pointer;transition:background .18s,color .18s;font-family:inherit}
+.toggle-btn:first-child{border-radius:8px 0 0 8px;border-right:none}
+.toggle-btn:last-child{border-radius:0 8px 8px 0}
+.toggle-btn.active{background:#2980b9;color:#fff}
+
+/* ── Column headers ── */
+#col-headers{display:grid;grid-template-columns:1fr 2px 1fr;gap:0 8px;margin:0 auto 6px;padding:0 6px}
+.col-header{text-align:center;font-weight:700;font-size:.95rem;color:#1a1a1a;padding:4px 0}
+.col-hdiv{background:#c0c0c0}
+
+/* ── Mosaic ── */
+#mosaic{display:flex;flex-direction:column;gap:6px}
+.section-heading{font-weight:700;font-style:italic;font-size:clamp(.72rem,1.2vw,.9rem);color:#1a1a1a;text-align:center;margin:14px 0 2px;letter-spacing:.02em}
+.mosaic-row{display:grid;grid-template-columns:1fr 2px 1fr;gap:0 8px;align-items:start}
+.po-half{display:flex;justify-content:flex-end;gap:5px;flex-wrap:nowrap;align-items:flex-start}
+.te-half{display:flex;justify-content:flex-start;gap:5px;flex-wrap:nowrap;align-items:flex-start}
+.row-divider{background:#c8c8c8;align-self:stretch}
+
+/* ── Tile ── */
+.tile{background:#fff;border-radius:8px;padding:7px 7px 8px;display:flex;flex-direction:column;align-items:center;min-width:70px;flex-shrink:0;box-shadow:0 1px 4px rgba(0,0,0,.07)}
+.tile-name{font-weight:700;font-size:clamp(.6rem,1vw,.78rem);color:#1a1a1a;margin-bottom:5px;text-align:center;white-space:nowrap}
+.pills-wrap{display:flex;flex-wrap:wrap;justify-content:center;gap:4px}
+
+/* ── Pill ── */
+.pill{position:relative;border-radius:6px;border:1.5px solid;padding:3px 7px;font-size:clamp(.6rem,.9vw,.75rem);font-weight:700;cursor:pointer;white-space:nowrap;transition:transform .1s,box-shadow .1s;font-family:inherit;line-height:1.45;overflow:visible}
+.pill:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,.18)}
+.pill:focus{outline:2px solid #2980b9;outline-offset:2px}
+
+/* evidence colors */
+.pill-proven       {background:#a9dfbf;border-color:#1e8449;color:#145a32}
+.pill-assumed      {background:#f9e79f;border-color:#d4ac0d;color:#7d6608}
+.pill-no_data      {background:#e8e8e8;border-color:#aaaaaa;color:#666}
+.pill-comp_reliable{background:#d6eaf8;border-color:#2980b9;color:#1a5276}
+.pill-comp_dft     {background:#fdebd0;border-color:#e67e22;color:#784212}
+.pill-comp_unstable{background:#d5d8dc;border-color:#7f8c8d;color:#555}
+
+/* DFT diagonal hatch */
+.pill-comp_dft::after{content:'';position:absolute;inset:0;border-radius:4px;background-image:repeating-linear-gradient(-45deg,#e6720044 0,#e6720044 1.5px,transparent 1.5px,transparent 6px);pointer-events:none;z-index:1}
+
+/* phase hatch (::before, z-index 1) */
+.phase-solid::before,.phase-gas::before,.phase-liquid::before{content:'';position:absolute;inset:0;border-radius:4px;pointer-events:none;z-index:1}
+.phase-solid::before{background-image:repeating-linear-gradient(45deg,#77777728 0,#77777728 1.5px,transparent 1.5px,transparent 6px)}
+.phase-liquid::before{background-image:repeating-linear-gradient(0deg,#77777728 0,#77777728 1.5px,transparent 1.5px,transparent 6px)}
+.phase-gas::before{background-image:radial-gradient(circle,#77777730 1.5px,transparent 1.5px) 0 0/7px 7px}
+
+/* badge spans inside pill must be above overlays */
+.pill>span{position:relative;z-index:2}
+.pill-lbl{display:inline-block}
+.pill-marker{position:absolute;top:0;right:2px;font-size:.58em;font-weight:700;line-height:1;z-index:3}
+.pill-badge-l{position:absolute;top:0;left:2px;font-size:.58em;font-weight:700;line-height:1;z-index:3;color:#333}
+.pill-cross{color:#c0392b}
+.pill.has-lbadge{padding-left:13px}
+.pill.has-rmarker{padding-right:13px}
+
+/* ── Tooltip ── */
+#tooltip{position:fixed;display:none;background:#1a1a2e;color:#fff;font-size:.76rem;font-weight:600;padding:5px 11px;border-radius:6px;pointer-events:none;z-index:500;white-space:nowrap;box-shadow:0 4px 14px rgba(0,0,0,.35)}
+
+/* ── Modal ── */
+#modal-overlay{position:fixed;inset:0;z-index:900;background:rgba(0,0,0,.52);display:none;align-items:center;justify-content:center}
+#modal-box{background:#fff;border-radius:12px;padding:28px 32px;max-width:460px;width:92%;position:relative;box-shadow:0 12px 40px rgba(0,0,0,.3);max-height:90vh;overflow-y:auto}
+#modal-close{position:absolute;top:10px;right:14px;font-size:1.5rem;background:none;border:none;cursor:pointer;color:#999;line-height:1}
+#modal-close:hover{color:#333}
+#modal-name{font-size:1.5rem;font-weight:700;color:#1a1a2e;margin-bottom:16px}
+#modal-table{width:100%;border-collapse:collapse}
+#modal-table th{text-align:left;padding:5px 12px 5px 0;color:#666;font-size:.78rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;vertical-align:top;white-space:nowrap}
+#modal-table td{padding:5px 0;font-size:.9rem;color:#1a1a1a;vertical-align:top}
+.status-badge{display:inline-block;border-radius:5px;border:1.5px solid;padding:2px 10px;font-size:.82rem;font-weight:700}
+
+/* ── Legend ── */
+#legend{margin:22px auto 0;max-width:960px;display:flex;flex-direction:column;align-items:center;gap:10px;font-size:.82rem}
+.legend-section{text-align:center}
+.legend-title{font-weight:700;font-size:.88rem;color:#333;margin-bottom:7px}
+.legend-row{display:flex;flex-wrap:wrap;justify-content:center;gap:10px 16px;align-items:center}
+.legend-pill{display:inline-flex;align-items:center;gap:6px}
+.legend-swatch{width:30px;height:18px;border-radius:4px;border:1.5px solid;position:relative;overflow:hidden;flex-shrink:0}
+.legend-swatch.dft-h::after{content:'';position:absolute;inset:0;background-image:repeating-linear-gradient(-45deg,#e6720044 0,#e6720044 1.5px,transparent 1.5px,transparent 6px)}
+.ls-solid{background-image:repeating-linear-gradient(45deg,#77777730 0,#77777730 1.5px,transparent 1.5px,transparent 6px)}
+.ls-gas{background-image:radial-gradient(circle,#77777730 1.5px,transparent 1.5px) 0 0/7px 7px}
+.ls-liquid{background-image:repeating-linear-gradient(0deg,#77777730 0,#77777730 1.5px,transparent 1.5px,transparent 6px)}
+.legend-label{color:#444}
+.legend-note{font-style:italic;color:#e67e22;font-size:.78rem;text-align:center}
+.legend-footnote{color:#666;font-size:.78rem;text-align:center}
+.legend-star{font-size:1rem;vertical-align:middle}
+</style>
+</head>
+<body>
+
+<!-- ══ GATE ══ -->
+<div id="gate">
+  <div id="gate-box">
+    <h2>Po/Te Candidate Molecules</h2>
+    <p>This resource is password protected.</p>
+    <input id="pw-input" type="password" placeholder="Password" autocomplete="off">
+    <button id="pw-submit">Enter</button>
+    <div id="pw-error"></div>
+  </div>
+</div>
+
+<!-- ══ APP ══ -->
+<div id="app">
+  <header>
+    <h1 id="fig-title"></h1>
+    <p id="fig-subtitle"></p>
+  </header>
+  <div id="toggle-bar">
+    <button class="toggle-btn active" id="btn-exp" onclick="setView('exp')">Experimental</button>
+    <button class="toggle-btn" id="btn-comp" onclick="setView('comp')">Computational</button>
+  </div>
+  <div id="col-headers">
+    <div class="col-header">Polonium species</div>
+    <div class="col-hdiv"></div>
+    <div class="col-header">Tellurium analogues</div>
+  </div>
+  <div id="mosaic"></div>
+  <div id="legend"></div>
+</div>
+
+<!-- ══ TOOLTIP ══ -->
+<div id="tooltip"></div>
+
+<!-- ══ MODAL ══ -->
+<div id="modal-overlay">
+  <div id="modal-box">
+    <button id="modal-close" aria-label="Close">&times;</button>
+    <div id="modal-name"></div>
+    <table id="modal-table">
+      <tr><th>Category</th><td id="mc-cat"></td></tr>
+      <tr><th>Side</th><td id="mc-side"></td></tr>
+      <tr><th>Exp. evidence</th><td id="mc-exp"></td></tr>
+      <tr><th>Comp. evidence</th><td id="mc-comp"></td></tr>
+      <tr><th>Phase (540–680 K)</th><td id="mc-phase"></td></tr>
+      <tr><th>Reference</th><td id="mc-ref"></td></tr>
+    </table>
+  </div>
+</div>
+
+<script>
+'use strict';
+
+/* ═══ DATA ═══ */
+const CATEGORIES = ["Diatomics","Triatomics","Pure oxides","Bismuth/Lead oxides","Hydrides","Hydroxides","Oxo-hydroxides","Bi/Pb hydrides","Bi/Pb hydroxides","Organics"];
+const MOSAIC_ROWS = [[0,1],[2],[3],[4,5],[6],[7,8],[9]];
+const SECTION_HEADINGS = [{r:0,l:"No contamination"},{r:1,l:"Oxygen inclusion"},{r:3,l:"Water contamination"},{r:6,l:"Organics"}];
+
+// s=status, ph=phase, mk=marker
+// exp status: proven|assumed|no_data
+// comp status: comp_reliable|comp_dft|comp_unstable|no_data
+const M = [
+  // cat 0 Diatomics
+  {id:"BiPo",      cat:0,si:"po",exp:{s:"no_data",    ph:"unknown",mk:""},        comp:{s:"comp_reliable",ph:"unknown",mk:"mertens"}},
+  {id:"Po\u2082",  cat:0,si:"po",exp:{s:"proven",     ph:"gas",   mk:""},        comp:{s:"comp_reliable",ph:"gas",   mk:"mertens"}},
+  {id:"PbPo",      cat:0,si:"po",exp:{s:"proven",     ph:"solid", mk:""},        comp:{s:"comp_reliable",ph:"gas",   mk:"mertens_star"}},
+  {id:"BiTe",      cat:0,si:"te",exp:{s:"proven",     ph:"solid", mk:""},        comp:{s:"comp_reliable",ph:"solid", mk:"mertens"}},
+  {id:"Te\u2082",  cat:0,si:"te",exp:{s:"proven",     ph:"gas",   mk:""},        comp:{s:"comp_reliable",ph:"gas",   mk:"mertens"}},
+  {id:"PbTe",      cat:0,si:"te",exp:{s:"proven",     ph:"solid", mk:""},        comp:{s:"comp_reliable",ph:"solid", mk:"mertens"}},
+  // cat 1 Triatomics
+  {id:"Po\u2083",             cat:1,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""}},
+  {id:"Bi\u2082Po",           cat:1,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""}},
+  {id:"Bi\u2082Po\u2083",     cat:1,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""}},
+  {id:"Bi\u2087Po\u2083",     cat:1,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""}},
+  {id:"BiPbPo",               cat:1,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""}},
+  {id:"Te\u2083",             cat:1,si:"te",exp:{s:"assumed",ph:"gas",    mk:""},comp:{s:"no_data",ph:"unknown",mk:""}},
+  {id:"Bi\u2082Te",           cat:1,si:"te",exp:{s:"proven", ph:"solid",  mk:""},comp:{s:"no_data",ph:"unknown",mk:""}},
+  {id:"Bi\u2082Te\u2083",     cat:1,si:"te",exp:{s:"proven", ph:"solid",  mk:""},comp:{s:"no_data",ph:"unknown",mk:""}},
+  {id:"Bi\u2087Te\u2083",     cat:1,si:"te",exp:{s:"proven", ph:"decomp", mk:""},comp:{s:"no_data",ph:"unknown",mk:""}},
+  {id:"BiPbTe",               cat:1,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""}},
+  // cat 2 Pure oxides
+  {id:"PoO",       cat:2,si:"po",exp:{s:"assumed",    ph:"unknown",mk:""},       comp:{s:"comp_reliable",ph:"gas",   mk:"mertens"}},
+  {id:"PoO\u2082", cat:2,si:"po",exp:{s:"proven",     ph:"solid", mk:""},        comp:{s:"comp_reliable",ph:"solid", mk:"mertens"}},
+  {id:"PoO\u2083", cat:2,si:"po",exp:{s:"assumed",    ph:"unknown",mk:""},       comp:{s:"comp_dft",     ph:"decomp",mk:""}},
+  {id:"Po\u2082O\u2085",cat:2,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},     comp:{s:"no_data",      ph:"unknown",mk:""}},
+  {id:"Po\u2082O\u2082",cat:2,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},     comp:{s:"no_data",      ph:"unknown",mk:""}},
+  {id:"Po\u2084O\u2089",cat:2,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},     comp:{s:"no_data",      ph:"unknown",mk:""}},
+  {id:"PoO\u2085", cat:2,si:"po",exp:{s:"no_data",    ph:"unknown",mk:""},       comp:{s:"comp_dft",     ph:"decomp",mk:""}},
+  {id:"PoO\u2086", cat:2,si:"po",exp:{s:"no_data",    ph:"unknown",mk:""},       comp:{s:"comp_dft",     ph:"decomp",mk:""}},
+  {id:"TeO",       cat:2,si:"te",exp:{s:"proven",     ph:"gas",   mk:""},        comp:{s:"comp_reliable",ph:"gas",   mk:"mertens"}},
+  {id:"TeO\u2082", cat:2,si:"te",exp:{s:"proven",     ph:"solid", mk:""},        comp:{s:"comp_dft",     ph:"unknown",mk:""}},
+  {id:"TeO\u2083", cat:2,si:"te",exp:{s:"proven",     ph:"solid", mk:""},        comp:{s:"comp_dft",     ph:"unknown",mk:""}},
+  {id:"Te\u2082O\u2085",cat:2,si:"te",exp:{s:"proven",ph:"solid", mk:""},       comp:{s:"no_data",      ph:"unknown",mk:""}},
+  {id:"Te\u2082O\u2082",cat:2,si:"te",exp:{s:"proven",ph:"gas",   mk:""},       comp:{s:"no_data",      ph:"unknown",mk:""}},
+  {id:"Te\u2084O\u2089",cat:2,si:"te",exp:{s:"proven",ph:"solid", mk:""},       comp:{s:"no_data",      ph:"unknown",mk:""}},
+  {id:"TeO\u2084", cat:2,si:"te",exp:{s:"no_data",    ph:"unknown",mk:""},       comp:{s:"comp_dft",     ph:"decomp",mk:""}},
+  {id:"TeO\u2085", cat:2,si:"te",exp:{s:"no_data",    ph:"unknown",mk:""},       comp:{s:"comp_dft",     ph:"decomp",mk:""}},
+  {id:"TeO\u2086", cat:2,si:"te",exp:{s:"no_data",    ph:"unknown",mk:""},       comp:{s:"comp_dft",     ph:"decomp",mk:""}},
+  // cat 3 Bismuth/Lead oxides
+  {id:"Bi\u2082PoO\u2086",   cat:3,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""}},
+  {id:"PbPoO\u2082",         cat:3,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""}},
+  {id:"PbPoO\u2083",         cat:3,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""}},
+  {id:"PbPoO\u2084",         cat:3,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""}},
+  {id:"Pb\u2082PoO\u2084",   cat:3,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""}},
+  {id:"Pb\u2082Po\u2083O\u2088",cat:3,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""}},
+  {id:"Pb\u2082Po\u2082O\u2086",cat:3,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""}},
+  {id:"Pb\u2083PoO\u2085",   cat:3,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""}},
+  {id:"Pb\u2085PoO\u2087",   cat:3,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""}},
+  {id:"PbPo\u2082O\u2085",   cat:3,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""}},
+  {id:"BiPbPoO",             cat:3,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""}},
+  {id:"Bi\u2082TeO\u2086",   cat:3,si:"te",exp:{s:"proven", ph:"solid", mk:"bulk"},comp:{s:"no_data",ph:"unknown",mk:""}},
+  {id:"PbTeO\u2083",         cat:3,si:"te",exp:{s:"proven", ph:"solid", mk:"bulk"},comp:{s:"no_data",ph:"unknown",mk:""}},
+  {id:"PbTeO\u2084",         cat:3,si:"te",exp:{s:"proven", ph:"solid", mk:"bulk"},comp:{s:"no_data",ph:"unknown",mk:""}},
+  {id:"Pb\u2082Te\u2083O\u2088",cat:3,si:"te",exp:{s:"proven",ph:"solid",mk:"bulk"},comp:{s:"no_data",ph:"unknown",mk:""}},
+  {id:"Pb\u2082TeO\u2084",   cat:3,si:"te",exp:{s:"proven", ph:"solid", mk:"bulk"},comp:{s:"no_data",ph:"unknown",mk:""}},
+  {id:"Pb\u2083TeO\u2085",   cat:3,si:"te",exp:{s:"proven", ph:"solid", mk:"bulk"},comp:{s:"no_data",ph:"unknown",mk:""}},
+  {id:"Pb\u2085TeO\u2087",   cat:3,si:"te",exp:{s:"proven", ph:"solid", mk:"bulk"},comp:{s:"no_data",ph:"unknown",mk:""}},
+  {id:"PbTe\u2082O\u2085",   cat:3,si:"te",exp:{s:"proven", ph:"solid", mk:""},   comp:{s:"no_data",ph:"unknown",mk:""}},
+  {id:"Pb\u2082Te\u2082O\u2086",cat:3,si:"te",exp:{s:"proven",ph:"solid",mk:""},  comp:{s:"no_data",ph:"unknown",mk:""}},
+  {id:"PbTeO\u2082",         cat:3,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},  comp:{s:"no_data",ph:"unknown",mk:""}},
+  {id:"BiPbTeO",             cat:3,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},  comp:{s:"no_data",ph:"unknown",mk:""}},
+  // cat 4 Hydrides
+  {id:"PoH\u2082",cat:4,si:"po",exp:{s:"assumed",    ph:"unknown",mk:""},        comp:{s:"comp_reliable",ph:"unknown",mk:"mertens"}},
+  {id:"PoH",     cat:4,si:"po",exp:{s:"no_data",     ph:"unknown",mk:""},        comp:{s:"comp_reliable",ph:"unknown",mk:"mertens"}},
+  {id:"H\u2082Te",cat:4,si:"te",exp:{s:"proven",     ph:"gas",   mk:""},         comp:{s:"comp_dft",     ph:"decomp", mk:""}},
+  {id:"TeH",     cat:4,si:"te",exp:{s:"proven",      ph:"gas",   mk:""},         comp:{s:"comp_reliable",ph:"gas",    mk:"mertens"}},
+  // cat 5 Hydroxides
+  {id:"Po(OH)",    cat:5,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",     ph:"unknown",mk:""}},
+  {id:"PoH(OH)",   cat:5,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",     ph:"unknown",mk:""}},
+  {id:"PoH(OH)\u2082",cat:5,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",  ph:"unknown",mk:""}},
+  {id:"PoH(OH)\u2083",cat:5,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",  ph:"unknown",mk:""}},
+  {id:"Po(OH)\u2082",cat:5,si:"po",exp:{s:"proven", ph:"unknown",mk:""},comp:{s:"comp_reliable",ph:"decomp",mk:"koksal_bluestar"}},
+  {id:"Po(OH)\u2083",cat:5,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",   ph:"unknown",mk:""}},
+  {id:"Po(OH)\u2084",cat:5,si:"po",exp:{s:"proven", ph:"unknown",mk:""},comp:{s:"comp_reliable",ph:"unknown",mk:"koksal"}},
+  {id:"Po(OH)\u2085",cat:5,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",   ph:"unknown",mk:""}},
+  {id:"Po(OH)\u2086",cat:5,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_reliable",ph:"decomp",mk:"koksal"}},
+  {id:"PoO\u2084H\u2082",cat:5,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"unknown",mk:""}},
+  {id:"Te(OH)",    cat:5,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",     ph:"unknown",mk:""}},
+  {id:"TeH(OH)",   cat:5,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",     ph:"unknown",mk:""}},
+  {id:"TeH(OH)\u2082",cat:5,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",  ph:"unknown",mk:""}},
+  {id:"TeH(OH)\u2083",cat:5,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",  ph:"unknown",mk:""}},
+  {id:"Te(OH)\u2082",cat:5,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",   ph:"unknown",mk:""}},
+  {id:"Te(OH)\u2083",cat:5,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",   ph:"unknown",mk:""}},
+  {id:"Te(OH)\u2084",cat:5,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_reliable",ph:"unknown",mk:"koksal"}},
+  {id:"Te(OH)\u2085",cat:5,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",   ph:"unknown",mk:""}},
+  {id:"Te(OH)\u2086",cat:5,si:"te",exp:{s:"proven", ph:"unknown",mk:""},comp:{s:"comp_reliable",ph:"unknown",mk:"koksal"}},
+  {id:"TeO\u2084H\u2082",cat:5,si:"te",exp:{s:"proven",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"unknown",mk:""}},
+  // cat 6 Oxo-hydroxides
+  {id:"PoO(OH)",    cat:6,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"unknown",mk:""}},
+  {id:"PoO(OH)\u2082",cat:6,si:"po",exp:{s:"assumed",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"unknown",mk:""}},
+  {id:"PoO\u2082(OH)\u2082",cat:6,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"unknown",mk:""}},
+  {id:"PoO\u2082(OH)",cat:6,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"unknown",mk:""}},
+  {id:"PoO\u2083(OH)",cat:6,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"decomp",mk:""}},
+  {id:"PoO(OH)\u2083",cat:6,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"unknown",mk:""}},
+  {id:"PoO\u2084(OH)",cat:6,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"decomp",mk:""}},
+  {id:"PoO\u2083(OH)\u2082",cat:6,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"unknown",mk:""}},
+  {id:"PoO\u2082(OH)\u2083",cat:6,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"unknown",mk:""}},
+  {id:"PoO(OH)\u2084",cat:6,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"unknown",mk:""}},
+  {id:"PoO\u2085(OH)",cat:6,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"decomp",mk:""}},
+  {id:"PoO\u2084(OH)\u2082",cat:6,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"decomp",mk:""}},
+  {id:"PoO\u2083(OH)\u2083",cat:6,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"unknown",mk:""}},
+  {id:"PoO\u2082(OH)\u2084",cat:6,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"unknown",mk:""}},
+  {id:"PoO(OH)\u2085",cat:6,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"unknown",mk:""}},
+  {id:"TeO(OH)",    cat:6,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"unknown",mk:""}},
+  {id:"TeO(OH)\u2082",cat:6,si:"te",exp:{s:"assumed",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"unknown",mk:""}},
+  {id:"TeO\u2082(OH)\u2082",cat:6,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"unknown",mk:""}},
+  {id:"TeO\u2082(OH)",cat:6,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"unknown",mk:""}},
+  {id:"TeO\u2083(OH)",cat:6,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"unknown",mk:""}},
+  {id:"TeO(OH)\u2083",cat:6,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"unknown",mk:""}},
+  {id:"TeO\u2084(OH)",cat:6,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"decomp",mk:""}},
+  {id:"TeO\u2083(OH)\u2082",cat:6,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"unknown",mk:""}},
+  {id:"TeO\u2082(OH)\u2083",cat:6,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"unknown",mk:""}},
+  {id:"TeO(OH)\u2084",cat:6,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"unknown",mk:""}},
+  {id:"TeO\u2085(OH)",cat:6,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"decomp",mk:""}},
+  {id:"TeO\u2084(OH)\u2082",cat:6,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"decomp",mk:""}},
+  {id:"TeO\u2083(OH)\u2083",cat:6,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"unknown",mk:""}},
+  {id:"TeO\u2082(OH)\u2084",cat:6,si:"te",exp:{s:"proven", ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"unknown",mk:""}},
+  {id:"TeO(OH)\u2085",cat:6,si:"te",exp:{s:"proven", ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"unknown",mk:""}},
+  // cat 7 Bi/Pb hydrides
+  {id:"BiPoH",cat:7,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""}},
+  {id:"PbPoH",cat:7,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""}},
+  {id:"BiTeH",cat:7,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""}},
+  {id:"PbTeH",cat:7,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""}},
+  // cat 8 Bi/Pb hydroxides
+  {id:"BiPo(OH)\u2084",cat:8,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""}},
+  {id:"PbPo(OH)\u2084",cat:8,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""}},
+  {id:"BiTe(OH)\u2084",cat:8,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""}},
+  {id:"PbTe(OH)\u2084",cat:8,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""}},
+  // cat 9 Organics
+  {id:"Po(C\u2082O\u2084)\u2082",cat:9,si:"po",exp:{s:"proven", ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""}},
+  {id:"Po(C\u2086H\u2085)\u2082",cat:9,si:"po",exp:{s:"assumed",ph:"decomp", mk:""},comp:{s:"no_data",ph:"unknown",mk:""}},
+  {id:"Te(C\u2082O\u2084)\u2082",cat:9,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""}},
+  {id:"Te(C\u2086H\u2085)\u2082",cat:9,si:"te",exp:{s:"proven", ph:"decomp", mk:""},comp:{s:"no_data",ph:"unknown",mk:""}},
+];
+
+/* ═══ LABEL MAPS ═══ */
+const EXP_LBL  = {proven:"Exp. proven",assumed:"Exp. assumed / inferred",no_data:"No data"};
+const COMP_LBL = {comp_reliable:"SO-CASSI / CASPT2 / CCSD(T)",comp_dft:"DFT only (unreliable for Po)",comp_unstable:"Computationally unstable",no_data:"No data"};
+const PHASE_LBL= {solid:"Solid",liquid:"Liquid",gas:"Gas",decomp:"Decomposes at MYRRHA T",unknown:"Unknown"};
+const MK_LBL   = {"mertens":"Mertens 2019","mertens_star":"Mertens 2019 (dominant volatile, O\u2082-free cover gas)","koksal":"K\u00f6ksal 2025","koksal_bluestar":"K\u00f6ksal 2025 (dominant outdoor species < 471 K)","bulk":"Bulk solid data only","":" \u2014 "};
+const MK_SYM   = {"mertens":{s:"M",c:"#333"},"mertens_star":{s:"\u2605",c:"#c8900a"},"koksal":{s:"K",c:"#333"},"koksal_bluestar":{s:"\u2605",c:"#2980b9"},"bulk":{s:"b",c:"#333"},"":{s:"",c:""}};
+const EXP_CLR  = {proven:{bg:"#a9dfbf",bd:"#1e8449",tx:"#145a32"},assumed:{bg:"#f9e79f",bd:"#d4ac0d",tx:"#7d6608"},no_data:{bg:"#e8e8e8",bd:"#aaaaaa",tx:"#666"}};
+const COMP_CLR = {comp_reliable:{bg:"#d6eaf8",bd:"#2980b9",tx:"#1a5276"},comp_dft:{bg:"#fdebd0",bd:"#e67e22",tx:"#784212"},comp_unstable:{bg:"#d5d8dc",bd:"#7f8c8d",tx:"#555"},no_data:{bg:"#e8e8e8",bd:"#aaaaaa",tx:"#666"}};
+
+/* ═══ STATE ═══ */
+let VIEW = 'exp';
+
+/* ═══ AUTH ═══ */
+function checkPw() {
+  const v = document.getElementById('pw-input').value;
+  if (v === 'trinity') {
+    sessionStorage.setItem('po_te_auth','1');
+    document.getElementById('gate').style.display = 'none';
+    showApp();
+  } else {
+    document.body.classList.remove('wrong-pw');
+    void document.body.offsetWidth;
+    document.body.classList.add('wrong-pw');
+    document.getElementById('pw-error').textContent = 'Incorrect password.';
+    document.getElementById('pw-input').value = '';
+    setTimeout(() => document.body.classList.remove('wrong-pw'), 700);
+  }
+}
+function showApp() {
+  document.getElementById('app').style.display = 'block';
+  setView('exp');
+}
+
+/* ═══ TOGGLE ═══ */
+function setView(v) {
+  VIEW = v;
+  document.getElementById('btn-exp').classList.toggle('active', v==='exp');
+  document.getElementById('btn-comp').classList.toggle('active', v==='comp');
+  document.getElementById('fig-title').textContent = v==='exp'
+    ? "Experimental Knowledge of Po/Te Candidate Molecules"
+    : "Computational Knowledge of Po/Te Candidate Molecules";
+  document.getElementById('fig-subtitle').textContent = v==='exp'
+    ? "Knowledge gaps shown in gray"
+    : "Experimental data excluded; computational evidence only";
+  renderMosaic();
+  renderLegend();
+}
+
+/* ═══ MOSAIC ═══ */
+function renderMosaic() {
+  const mosaic = document.getElementById('mosaic');
+  mosaic.innerHTML = '';
+  MOSAIC_ROWS.forEach((cats, ri) => {
+    const sec = SECTION_HEADINGS.find(s => s.r === ri);
+    if (sec) { const h=document.createElement('div'); h.className='section-heading'; h.textContent=sec.l; mosaic.appendChild(h); }
+    const row = document.createElement('div'); row.className='mosaic-row';
+    const po = document.createElement('div'); po.className='po-half';
+    const div = document.createElement('div'); div.className='row-divider';
+    const te = document.createElement('div'); te.className='te-half';
+    cats.forEach(cid => {
+      po.appendChild(buildTile(cid, M.filter(m=>m.cat===cid&&m.si==='po')));
+      te.appendChild(buildTile(cid, M.filter(m=>m.cat===cid&&m.si==='te')));
+    });
+    row.appendChild(po); row.appendChild(div); row.appendChild(te);
+    mosaic.appendChild(row);
+  });
+}
+
+function buildTile(cid, mols) {
+  const t = document.createElement('div'); t.className='tile';
+  const n = document.createElement('div'); n.className='tile-name'; n.textContent=CATEGORIES[cid]; t.appendChild(n);
+  const w = document.createElement('div'); w.className='pills-wrap';
+  mols.forEach(m => w.appendChild(buildPill(m)));
+  t.appendChild(w); return t;
+}
+
+function buildPill(mol) {
+  const d = VIEW==='exp' ? mol.exp : mol.comp;
+  const btn = document.createElement('button');
+  const phCls = ['solid','gas','liquid'].includes(d.ph) ? 'phase-'+d.ph : '';
+  btn.className = ['pill','pill-'+d.s, phCls].filter(Boolean).join(' ');
+  btn.dataset.id = mol.id;
+  // left badge
+  let hasL = false;
+  if (d.s==='comp_unstable') {
+    const x=document.createElement('span'); x.className='pill-badge-l pill-cross'; x.textContent='\u2717'; btn.appendChild(x); hasL=true;
+  } else if (d.ph==='decomp') {
+    const x=document.createElement('span'); x.className='pill-badge-l'; x.textContent='D'; btn.appendChild(x); hasL=true;
+  }
+  if (hasL) btn.classList.add('has-lbadge');
+  // label
+  const lbl=document.createElement('span'); lbl.className='pill-lbl'; lbl.textContent=mol.id; btn.appendChild(lbl);
+  // right marker
+  const mk = MK_SYM[d.mk]||{s:'',c:''};
+  if (mk.s) {
+    const ms=document.createElement('span'); ms.className='pill-marker'; ms.style.color=mk.c; ms.textContent=mk.s; btn.appendChild(ms);
+    btn.classList.add('has-rmarker');
+  }
+  btn.addEventListener('mouseenter', e=>showTip(e,mol));
+  btn.addEventListener('mouseleave', hideTip);
+  btn.addEventListener('mousemove',  e=>moveTip(e));
+  btn.addEventListener('click',      ()=>openModal(mol));
+  return btn;
+}
+
+/* ═══ TOOLTIP ═══ */
+const TIP = document.getElementById('tooltip');
+function showTip(e, mol) {
+  const d = VIEW==='exp' ? mol.exp : mol.comp;
+  const st = VIEW==='exp' ? EXP_LBL[d.s] : COMP_LBL[d.s];
+  const parts = [st, PHASE_LBL[d.ph]];
+  if (d.mk) parts.push(MK_LBL[d.mk]||d.mk);
+  TIP.textContent = parts.join(' · ');
+  TIP.style.display='block'; moveTip(e);
+}
+function moveTip(e) {
+  const tw=TIP.offsetWidth, th=TIP.offsetHeight;
+  let x=e.clientX-tw/2, y=e.clientY-th-14;
+  if(x<4) x=4; if(x+tw>window.innerWidth-4) x=window.innerWidth-tw-4;
+  if(y<4) y=e.clientY+18;
+  TIP.style.left=x+'px'; TIP.style.top=y+'px';
+}
+function hideTip() { TIP.style.display='none'; }
+
+/* ═══ MODAL ═══ */
+function openModal(mol) {
+  hideTip();
+  document.getElementById('modal-name').textContent = mol.id;
+  document.getElementById('mc-cat').textContent  = CATEGORIES[mol.cat];
+  document.getElementById('mc-side').textContent = mol.si==='po'?'Polonium':'Tellurium';
+  const ec=EXP_CLR[mol.exp.s]||EXP_CLR.no_data;
+  document.getElementById('mc-exp').innerHTML = `<span class="status-badge" style="background:${ec.bg};border-color:${ec.bd};color:${ec.tx}">${EXP_LBL[mol.exp.s]}</span>`;
+  const cc=COMP_CLR[mol.comp.s]||COMP_CLR.no_data;
+  document.getElementById('mc-comp').innerHTML = `<span class="status-badge" style="background:${cc.bg};border-color:${cc.bd};color:${cc.tx}">${COMP_LBL[mol.comp.s]}</span>`;
+  const d = VIEW==='exp' ? mol.exp : mol.comp;
+  document.getElementById('mc-phase').textContent = PHASE_LBL[d.ph];
+  document.getElementById('mc-ref').textContent   = MK_LBL[d.mk]!==undefined ? MK_LBL[d.mk] : (d.mk||'—');
+  document.getElementById('modal-overlay').style.display='flex';
+  document.getElementById('modal-close').focus();
+}
+function closeModal() { document.getElementById('modal-overlay').style.display='none'; }
+
+/* ═══ LEGEND ═══ */
+function renderLegend() {
+  const leg = document.getElementById('legend'); leg.innerHTML='';
+  if (VIEW==='exp') {
+    leg.appendChild(mkLegSec('Evidence level',[
+      {bg:'#a9dfbf',bd:'#1e8449',lbl:'Exp. proven'},
+      {bg:'#f9e79f',bd:'#d4ac0d',lbl:'Exp. assumed'},
+      {bg:'#e8e8e8',bd:'#aaaaaa',lbl:'No data'},
+    ]));
+    leg.appendChild(mkPhaseLeg());
+    leg.appendChild(mkFn('b\u00a0=\u00a0bulk solid data only\u2003D\u00a0=\u00a0not present at MYRRHA temperatures'));
+  } else {
+    leg.appendChild(mkLegSec('Computational evidence',[
+      {bg:'#d6eaf8',bd:'#2980b9',lbl:'SO-CASSI / CASPT2',hatch:false},
+      {bg:'#fdebd0',bd:'#e67e22',lbl:'DFT only',hatch:true},
+      {bg:'#e8e8e8',bd:'#aaaaaa',lbl:'No data'},
+    ]));
+    const w=document.createElement('div'); w.className='legend-note';
+    w.textContent='DFT results are unreliable for Po without spin-orbit coupling'; leg.appendChild(w);
+    const s=document.createElement('div'); s.className='legend-footnote';
+    s.innerHTML='<span class="legend-star" style="color:#c8900a">\u2605</span> dominant volatile in O\u2082-free reactor cover gas (Mertens 2019)\u2003<span class="legend-star" style="color:#2980b9">\u2605</span> dominant outdoor species below 471\u202fK (Mertens thesis)';
+    leg.appendChild(s);
+    leg.appendChild(mkFn('M\u00a0= Mertens 2019\u2003K\u00a0= K\u00f6ksal 2025\u2003D\u00a0= not present at MYRRHA temperatures'));
+  }
+}
+function mkLegSec(title, items) {
+  const sec=document.createElement('div'); sec.className='legend-section';
+  const t=document.createElement('div'); t.className='legend-title'; t.textContent=title; sec.appendChild(t);
+  const row=document.createElement('div'); row.className='legend-row';
+  items.forEach(it=>{
+    const p=document.createElement('div'); p.className='legend-pill';
+    const sw=document.createElement('div'); sw.className='legend-swatch'+(it.hatch?' dft-h':'');
+    sw.style.background=it.bg; sw.style.borderColor=it.bd; p.appendChild(sw);
+    const l=document.createElement('span'); l.className='legend-label'; l.textContent=it.lbl; p.appendChild(l);
+    row.appendChild(p);
+  });
+  sec.appendChild(row); return sec;
+}
+function mkPhaseLeg() {
+  const sec=document.createElement('div'); sec.className='legend-section';
+  const t=document.createElement('div'); t.className='legend-title'; t.textContent='Phase at 540\u2013680\u202fK'; sec.appendChild(t);
+  const row=document.createElement('div'); row.className='legend-row';
+  [['solid','Solid'],['gas','Gas'],['liquid','Liquid'],['','Unknown']].forEach(([ph,lbl])=>{
+    const p=document.createElement('div'); p.className='legend-pill';
+    const sw=document.createElement('div'); sw.className='legend-swatch'+(ph?' ls-'+ph:'');
+    sw.style.background='#e8e8e8'; sw.style.borderColor='#aaaaaa'; p.appendChild(sw);
+    const l=document.createElement('span'); l.className='legend-label'; l.textContent=lbl; p.appendChild(l);
+    row.appendChild(p);
+  });
+  sec.appendChild(row); return sec;
+}
+function mkFn(txt) {
+  const d=document.createElement('div'); d.className='legend-footnote'; d.textContent=txt; return d;
+}
+
+/* ═══ INIT ═══ */
+document.addEventListener('DOMContentLoaded', () => {
+  if (sessionStorage.getItem('po_te_auth')==='1') {
+    document.getElementById('gate').style.display='none';
+    showApp();
+  }
+  document.getElementById('pw-submit').addEventListener('click', checkPw);
+  document.getElementById('pw-input').addEventListener('keydown', e=>{ if(e.key==='Enter') checkPw(); });
+  document.getElementById('modal-close').addEventListener('click', closeModal);
+  document.getElementById('modal-overlay').addEventListener('click', e=>{ if(e.target.id==='modal-overlay') closeModal(); });
+  document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeModal(); });
+});
+</script>
+</body>
+</html>
