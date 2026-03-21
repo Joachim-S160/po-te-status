@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Po/Te Candidate Molecules — Status</title>
+<title>Po/Te Containing Molecules: Existing Knowledge</title>
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Arial,sans-serif;background:#f0f2f6;min-height:100vh;transition:background .15s}
@@ -35,20 +35,20 @@ header{text-align:center;margin-bottom:14px}
 .toggle-btn.active{background:#2980b9;color:#fff}
 
 /* ── Column headers ── */
-#col-headers{display:grid;grid-template-columns:1fr 2px 1fr;gap:0 8px;margin:0 auto 6px;padding:0 6px}
+#col-headers{display:grid;grid-template-columns:minmax(0,1fr) 2px minmax(0,1fr);gap:0 8px;margin:0 auto 6px;padding:0 6px}
 .col-header{text-align:center;font-weight:700;font-size:.95rem;color:#1a1a1a;padding:4px 0}
 .col-hdiv{background:#c0c0c0}
 
 /* ── Mosaic ── */
 #mosaic{display:flex;flex-direction:column;gap:6px}
 .section-heading{font-weight:700;font-style:italic;font-size:clamp(.72rem,1.2vw,.9rem);color:#1a1a1a;text-align:center;margin:14px 0 2px;letter-spacing:.02em}
-.mosaic-row{display:grid;grid-template-columns:1fr 2px 1fr;gap:0 8px;align-items:start}
-.po-half{display:flex;justify-content:flex-end;gap:5px;flex-wrap:nowrap;align-items:flex-start}
-.te-half{display:flex;justify-content:flex-start;gap:5px;flex-wrap:nowrap;align-items:flex-start}
+.mosaic-row{display:grid;grid-template-columns:minmax(0,1fr) 2px minmax(0,1fr);gap:0 8px;align-items:start}
+.po-half{display:flex;justify-content:flex-end;gap:5px;flex-wrap:nowrap;align-items:flex-start;min-width:0}
+.te-half{display:flex;justify-content:flex-start;gap:5px;flex-wrap:nowrap;align-items:flex-start;min-width:0}
 .row-divider{background:#c8c8c8;align-self:stretch}
 
 /* ── Tile ── */
-.tile{background:#fff;border-radius:8px;padding:7px 7px 8px;display:flex;flex-direction:column;align-items:center;min-width:70px;flex-shrink:0;box-shadow:0 1px 4px rgba(0,0,0,.07)}
+.tile{background:#fff;border-radius:8px;padding:7px 7px 8px;display:flex;flex-direction:column;align-items:center;min-width:0;flex-shrink:1;max-width:100%;box-shadow:0 1px 4px rgba(0,0,0,.07)}
 .tile-name{font-weight:700;font-size:clamp(.6rem,1vw,.78rem);color:#1a1a1a;margin-bottom:5px;text-align:center;white-space:nowrap}
 .pills-wrap{display:flex;flex-wrap:wrap;justify-content:center;gap:4px}
 
@@ -78,9 +78,8 @@ header{text-align:center;margin-bottom:14px}
 .pill>span{position:relative;z-index:2}
 .pill-lbl{display:inline-block}
 .pill-marker{position:absolute;top:0;right:2px;font-size:.58em;font-weight:700;line-height:1;z-index:3}
-.pill-badge-l{position:absolute;top:0;left:2px;font-size:.58em;font-weight:700;line-height:1;z-index:3;color:#333}
+.pill-decomp{font-size:.58em;font-weight:700;color:#555;vertical-align:super;margin-left:1px;position:relative;z-index:2}
 .pill-cross{color:#c0392b}
-.pill.has-lbadge{padding-left:13px}
 .pill.has-rmarker{padding-right:13px}
 
 /* ── Tooltip ── */
@@ -119,7 +118,7 @@ header{text-align:center;margin-bottom:14px}
 <!-- ══ GATE ══ -->
 <div id="gate">
   <div id="gate-box">
-    <h2>Po/Te Candidate Molecules</h2>
+    <h2>Po/Te Containing Molecules: Existing Knowledge</h2>
     <p>This resource is password protected.</p>
     <input id="pw-input" type="password" placeholder="Password" autocomplete="off">
     <button id="pw-submit">Enter</button>
@@ -144,6 +143,10 @@ header{text-align:center;margin-bottom:14px}
   </div>
   <div id="mosaic"></div>
   <div id="legend"></div>
+  <div id="qr-section" style="text-align:center;margin:28px 0 12px">
+    <div style="font-size:.8rem;color:#888;margin-bottom:8px">Scan to open this page</div>
+    <img id="qr-img" width="120" height="120" alt="QR code" style="border-radius:6px;border:2px solid #ddd">
+  </div>
 </div>
 
 <!-- ══ TOOLTIP ══ -->
@@ -159,8 +162,11 @@ header{text-align:center;margin-bottom:14px}
       <tr><th>Side</th><td id="mc-side"></td></tr>
       <tr><th>Exp. evidence</th><td id="mc-exp"></td></tr>
       <tr><th>Comp. evidence</th><td id="mc-comp"></td></tr>
-      <tr><th>Phase (540–680 K)</th><td id="mc-phase"></td></tr>
+      <tr><th>Exp. phase</th><td id="mc-phase-exp"></td></tr>
+      <tr><th>Comp. phase</th><td id="mc-phase-comp"></td></tr>
       <tr><th>Reference</th><td id="mc-ref"></td></tr>
+      <tr id="mc-quote-row" style="display:none"><th style="white-space:normal;padding-right:10px;vertical-align:top">Key quote</th><td id="mc-quote" style="font-style:italic;font-size:.84rem;color:#444;border-left:3px solid #e0e0e0;padding-left:8px"></td></tr>
+      <tr id="mc-quoteref-row" style="display:none"><th></th><td id="mc-quoteref" style="font-size:.78rem;color:#888;padding-top:2px"></td></tr>
     </table>
   </div>
 </div>
@@ -178,143 +184,176 @@ const SECTION_HEADINGS = [{r:0,l:"No contamination"},{r:1,l:"Oxygen inclusion"},
 // comp status: comp_reliable|comp_dft|comp_unstable|no_data
 const M = [
   // cat 0 Diatomics
-  {id:"BiPo",      cat:0,si:"po",exp:{s:"no_data",    ph:"unknown",mk:""},        comp:{s:"comp_reliable",ph:"unknown",mk:"mertens"}},
-  {id:"Po\u2082",  cat:0,si:"po",exp:{s:"proven",     ph:"gas",   mk:""},        comp:{s:"comp_reliable",ph:"gas",   mk:"mertens"}},
-  {id:"PbPo",      cat:0,si:"po",exp:{s:"proven",     ph:"solid", mk:""},        comp:{s:"comp_reliable",ph:"gas",   mk:"mertens_star"}},
-  {id:"BiTe",      cat:0,si:"te",exp:{s:"proven",     ph:"solid", mk:""},        comp:{s:"comp_reliable",ph:"solid", mk:"mertens"}},
-  {id:"Te\u2082",  cat:0,si:"te",exp:{s:"proven",     ph:"gas",   mk:""},        comp:{s:"comp_reliable",ph:"gas",   mk:"mertens"}},
-  {id:"PbTe",      cat:0,si:"te",exp:{s:"proven",     ph:"solid", mk:""},        comp:{s:"comp_reliable",ph:"solid", mk:"mertens"}},
+  {id:"BiPo",      cat:0,si:"po",exp:{s:"no_data",    ph:"unknown",mk:""},        comp:{s:"comp_reliable",ph:"unknown",mk:"mertens"},
+   q:"The six molecules studied in this work are PoH, LiPo, PoO, PbPo, BiPo, and Po\u2082, which were all treated at the CASPT2/SO-CASSI level of theory with ANO-RCC basis sets.",qs:"Mertens 2019"},
+  {id:"Po\u2082",  cat:0,si:"po",exp:{s:"proven",     ph:"gas",   mk:""},        comp:{s:"comp_reliable",ph:"gas",   mk:"mertens"},
+   q:"The only Po-containing molecule for which an experimental dissociation energy has been reported is Po\u2082 (1.90 eV) in 1957 by Charles et al.",qs:"Mertens 2019"},
+  {id:"PbPo",      cat:0,si:"po",exp:{s:"proven",     ph:"solid", mk:""},        comp:{s:"comp_reliable",ph:"gas",   mk:"mertens_star"},
+   q:"Zinc polonide sublimes at 400\u00b0C and the silver, lead, and platinum compounds decompose at about 600\u00b0C.",qs:"Bagnall 1962"},
+  {id:"BiTe",      cat:0,si:"te",exp:{s:"proven",     ph:"solid", mk:""},        comp:{s:"comp_reliable",ph:"solid", mk:"mertens"},
+   q:"Liquid + Bi\u2082Te\u2083 \u2194 BiTe, Reaction temperature 559.5 \u00b0C, Peritectic.",qs:"Drzewowska & Onderka 2023"},
+  {id:"Te\u2082",  cat:0,si:"te",exp:{s:"proven",     ph:"gas",   mk:""},        comp:{s:"comp_reliable",ph:"gas",   mk:"mertens"},
+   q:"The Te\u2082\u207b photoelectron spectrum consists of a structured band extending from approximately 1.6 to 2.5 eV electron kinetic energy... EA(Te\u2082) = 1.92 \u00b1 0.07 eV.",qs:"Snodgrass 1989"},
+  {id:"PbTe",      cat:0,si:"te",exp:{s:"proven",     ph:"solid", mk:""},        comp:{s:"comp_reliable",ph:"solid", mk:"mertens"},q:"",qs:""},
   // cat 1 Triatomics
-  {id:"Po\u2083",             cat:1,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""}},
-  {id:"Bi\u2082Po",           cat:1,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""}},
-  {id:"Bi\u2082Po\u2083",     cat:1,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""}},
-  {id:"Bi\u2087Po\u2083",     cat:1,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""}},
-  {id:"BiPbPo",               cat:1,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""}},
-  {id:"Te\u2083",             cat:1,si:"te",exp:{s:"assumed",ph:"gas",    mk:""},comp:{s:"no_data",ph:"unknown",mk:""}},
-  {id:"Bi\u2082Te",           cat:1,si:"te",exp:{s:"proven", ph:"solid",  mk:""},comp:{s:"no_data",ph:"unknown",mk:""}},
-  {id:"Bi\u2082Te\u2083",     cat:1,si:"te",exp:{s:"proven", ph:"solid",  mk:""},comp:{s:"no_data",ph:"unknown",mk:""}},
-  {id:"Bi\u2087Te\u2083",     cat:1,si:"te",exp:{s:"proven", ph:"decomp", mk:""},comp:{s:"no_data",ph:"unknown",mk:""}},
-  {id:"BiPbTe",               cat:1,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""}},
+  {id:"Po\u2083",             cat:1,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""},q:"",qs:""},
+  {id:"Bi\u2082Po",           cat:1,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""},q:"",qs:""},
+  {id:"Bi\u2082Po\u2083",     cat:1,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""},q:"",qs:""},
+  {id:"Bi\u2087Po\u2083",     cat:1,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""},q:"",qs:""},
+  {id:"BiPbPo",               cat:1,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""},q:"",qs:""},
+  {id:"Te\u2083",             cat:1,si:"te",exp:{s:"assumed",ph:"gas",    mk:""},comp:{s:"no_data",ph:"unknown",mk:""},
+   q:"The absence of significant Te\u2083\u207b photofragmentation near threshold suggests that the Te\u2083\u207b is photodissociating to Te\u2082 + Te\u207b.",qs:"Snodgrass 1989"},
+  {id:"Bi\u2082Te",           cat:1,si:"te",exp:{s:"proven", ph:"solid",  mk:""},comp:{s:"no_data",ph:"unknown",mk:""},
+   q:"Liquid + BiTe \u2194 Bi\u2082Te, Reaction temperature 421.4 \u00b0C, Peritectic.",qs:"Drzewowska & Onderka 2023"},
+  {id:"Bi\u2082Te\u2083",     cat:1,si:"te",exp:{s:"proven", ph:"solid",  mk:""},comp:{s:"no_data",ph:"unknown",mk:""},
+   q:"Liquid \u2194 Bi\u2082Te\u2083, Reaction temperature 584.4 \u00b0C, Congruent melting.",qs:"Drzewowska & Onderka 2023"},
+  {id:"Bi\u2087Te\u2083",     cat:1,si:"te",exp:{s:"proven", ph:"decomp", mk:""},comp:{s:"no_data",ph:"unknown",mk:""},
+   q:"Liquid + Bi\u2082Te \u2194 Bi\u2087Te\u2083, Reaction temperature 316.9 \u00b0C, Peritectic.",qs:"Drzewowska & Onderka 2023"},
+  {id:"BiPbTe",               cat:1,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""},q:"",qs:""},
   // cat 2 Pure oxides
-  {id:"PoO",       cat:2,si:"po",exp:{s:"assumed",    ph:"unknown",mk:""},       comp:{s:"comp_reliable",ph:"gas",   mk:"mertens"}},
-  {id:"PoO\u2082", cat:2,si:"po",exp:{s:"proven",     ph:"solid", mk:""},        comp:{s:"comp_reliable",ph:"solid", mk:"mertens"}},
-  {id:"PoO\u2083", cat:2,si:"po",exp:{s:"assumed",    ph:"unknown",mk:""},       comp:{s:"comp_dft",     ph:"decomp",mk:""}},
-  {id:"Po\u2082O\u2085",cat:2,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},     comp:{s:"no_data",      ph:"unknown",mk:""}},
-  {id:"Po\u2082O\u2082",cat:2,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},     comp:{s:"no_data",      ph:"unknown",mk:""}},
-  {id:"Po\u2084O\u2089",cat:2,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},     comp:{s:"no_data",      ph:"unknown",mk:""}},
-  {id:"PoO\u2085", cat:2,si:"po",exp:{s:"no_data",    ph:"unknown",mk:""},       comp:{s:"comp_dft",     ph:"decomp",mk:""}},
-  {id:"PoO\u2086", cat:2,si:"po",exp:{s:"no_data",    ph:"unknown",mk:""},       comp:{s:"comp_dft",     ph:"decomp",mk:""}},
-  {id:"TeO",       cat:2,si:"te",exp:{s:"proven",     ph:"gas",   mk:""},        comp:{s:"comp_reliable",ph:"gas",   mk:"mertens"}},
-  {id:"TeO\u2082", cat:2,si:"te",exp:{s:"proven",     ph:"solid", mk:""},        comp:{s:"comp_dft",     ph:"unknown",mk:""}},
-  {id:"TeO\u2083", cat:2,si:"te",exp:{s:"proven",     ph:"solid", mk:""},        comp:{s:"comp_dft",     ph:"unknown",mk:""}},
-  {id:"Te\u2082O\u2085",cat:2,si:"te",exp:{s:"proven",ph:"solid", mk:""},       comp:{s:"no_data",      ph:"unknown",mk:""}},
-  {id:"Te\u2082O\u2082",cat:2,si:"te",exp:{s:"proven",ph:"gas",   mk:""},       comp:{s:"no_data",      ph:"unknown",mk:""}},
-  {id:"Te\u2084O\u2089",cat:2,si:"te",exp:{s:"proven",ph:"solid", mk:""},       comp:{s:"no_data",      ph:"unknown",mk:""}},
-  {id:"TeO\u2084", cat:2,si:"te",exp:{s:"no_data",    ph:"unknown",mk:""},       comp:{s:"comp_dft",     ph:"decomp",mk:""}},
-  {id:"TeO\u2085", cat:2,si:"te",exp:{s:"no_data",    ph:"unknown",mk:""},       comp:{s:"comp_dft",     ph:"decomp",mk:""}},
-  {id:"TeO\u2086", cat:2,si:"te",exp:{s:"no_data",    ph:"unknown",mk:""},       comp:{s:"comp_dft",     ph:"decomp",mk:""}},
+  {id:"PoO",       cat:2,si:"po",exp:{s:"assumed",    ph:"unknown",mk:""},       comp:{s:"comp_reliable",ph:"gas",   mk:"mertens"},
+   q:"The black monoxide appears to be formed by the spontaneous decomposition of polonium sulfotrioxide and selenotrioxide.",qs:"Bagnall 1962"},
+  {id:"PoO\u2082", cat:2,si:"po",exp:{s:"proven",     ph:"solid", mk:""},        comp:{s:"comp_reliable",ph:"solid", mk:"mertens"},
+   q:"This oxide is formed from the elements at 250\u00b0C, its composition being established by measuring the oxygen taken up by the metal. It exists in two crystal modifications, a yellow low temperature form (face-centered cubic) and a red high temperature form (tetragonal).",qs:"Bagnall 1962"},
+  {id:"PoO\u2083", cat:2,si:"po",exp:{s:"assumed",    ph:"unknown",mk:""},       comp:{s:"comp_dft",     ph:"decomp",mk:""},
+   q:"This compound is said to be formed on the trace scale by the anodic deposition of polonium from an acid solution and, although there is no direct experimental evidence for the composition of the anodic deposit or the presence of a peroxide linkage, the dissolution of the deposit by hydrogen peroxide is certainly suggestive of a higher charge number.",qs:"Bagnall 1962"},
+  {id:"Po\u2082O\u2085",cat:2,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},     comp:{s:"no_data",      ph:"unknown",mk:""},q:"",qs:""},
+  {id:"Po\u2082O\u2082",cat:2,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},     comp:{s:"no_data",      ph:"unknown",mk:""},q:"",qs:""},
+  {id:"Po\u2084O\u2089",cat:2,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},     comp:{s:"no_data",      ph:"unknown",mk:""},q:"",qs:""},
+  {id:"PoO\u2085", cat:2,si:"po",exp:{s:"no_data",    ph:"unknown",mk:""},       comp:{s:"comp_dft",     ph:"decomp",mk:""},q:"",qs:""},
+  {id:"PoO\u2086", cat:2,si:"po",exp:{s:"no_data",    ph:"unknown",mk:""},       comp:{s:"comp_dft",     ph:"decomp",mk:""},q:"",qs:""},
+  {id:"TeO",       cat:2,si:"te",exp:{s:"proven",     ph:"gas",   mk:""},        comp:{s:"comp_reliable",ph:"gas",   mk:"mertens"},
+   q:"The vertical and adiabatic electron affinities for TeO are measured as 2.09 \u00b1 0.12 eV and 1.70 \u00b1 0.12 eV, respectively.",qs:"Snodgrass 1989"},
+  {id:"TeO\u2082", cat:2,si:"te",exp:{s:"proven",     ph:"solid", mk:""},        comp:{s:"comp_dft",     ph:"unknown",mk:""},q:"",qs:""},
+  {id:"TeO\u2083", cat:2,si:"te",exp:{s:"proven",     ph:"solid", mk:""},        comp:{s:"comp_dft",     ph:"unknown",mk:""},
+   q:"It appears to be a reasonable consensus that H\u2082TeO\u2084, TeO\u2083 and Te\u2082O\u2085 occur as intermediates of this degradation [of H\u2086TeO\u2086], and that TeO\u2082 is the final oxide product.",qs:"Ahmed 2000"},
+  {id:"Te\u2082O\u2085",cat:2,si:"te",exp:{s:"proven",ph:"solid", mk:""},       comp:{s:"no_data",      ph:"unknown",mk:""},
+   q:"At constant temperature the onset of the thermal decomposition of Te\u2082O\u2085 to TeO\u2082 is listed at 500-520 \u00b0C, the decomposition rate being appreciable at 595 \u00b0C.",qs:"Ahmed 2000"},
+  {id:"Te\u2082O\u2082",cat:2,si:"te",exp:{s:"proven",ph:"gas",   mk:""},       comp:{s:"no_data",      ph:"unknown",mk:""},q:"",qs:""},
+  {id:"Te\u2084O\u2089",cat:2,si:"te",exp:{s:"proven",ph:"solid", mk:""},       comp:{s:"no_data",      ph:"unknown",mk:""},
+   q:"The onset of the thermal decomposition of Te\u2084O\u2089 is listed at some 500 \u00b0C, and the final product obtained at 650 \u00b0C is phase-pure TeO\u2082.",qs:"Ahmed 2000"},
+  {id:"TeO\u2084", cat:2,si:"te",exp:{s:"no_data",    ph:"unknown",mk:""},       comp:{s:"comp_dft",     ph:"decomp",mk:""},q:"",qs:""},
+  {id:"TeO\u2085", cat:2,si:"te",exp:{s:"no_data",    ph:"unknown",mk:""},       comp:{s:"comp_dft",     ph:"decomp",mk:""},q:"",qs:""},
+  {id:"TeO\u2086", cat:2,si:"te",exp:{s:"no_data",    ph:"unknown",mk:""},       comp:{s:"comp_dft",     ph:"decomp",mk:""},q:"",qs:""},
   // cat 3 Bismuth/Lead oxides
-  {id:"Bi\u2082PoO\u2086",   cat:3,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""}},
-  {id:"PbPoO\u2082",         cat:3,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""}},
-  {id:"PbPoO\u2083",         cat:3,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""}},
-  {id:"PbPoO\u2084",         cat:3,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""}},
-  {id:"Pb\u2082PoO\u2084",   cat:3,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""}},
-  {id:"Pb\u2082Po\u2083O\u2088",cat:3,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""}},
-  {id:"Pb\u2082Po\u2082O\u2086",cat:3,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""}},
-  {id:"Pb\u2083PoO\u2085",   cat:3,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""}},
-  {id:"Pb\u2085PoO\u2087",   cat:3,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""}},
-  {id:"PbPo\u2082O\u2085",   cat:3,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""}},
-  {id:"BiPbPoO",             cat:3,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""}},
-  {id:"Bi\u2082TeO\u2086",   cat:3,si:"te",exp:{s:"proven", ph:"solid", mk:"bulk"},comp:{s:"no_data",ph:"unknown",mk:""}},
-  {id:"PbTeO\u2083",         cat:3,si:"te",exp:{s:"proven", ph:"solid", mk:"bulk"},comp:{s:"no_data",ph:"unknown",mk:""}},
-  {id:"PbTeO\u2084",         cat:3,si:"te",exp:{s:"proven", ph:"solid", mk:"bulk"},comp:{s:"no_data",ph:"unknown",mk:""}},
-  {id:"Pb\u2082Te\u2083O\u2088",cat:3,si:"te",exp:{s:"proven",ph:"solid",mk:"bulk"},comp:{s:"no_data",ph:"unknown",mk:""}},
-  {id:"Pb\u2082TeO\u2084",   cat:3,si:"te",exp:{s:"proven", ph:"solid", mk:"bulk"},comp:{s:"no_data",ph:"unknown",mk:""}},
-  {id:"Pb\u2083TeO\u2085",   cat:3,si:"te",exp:{s:"proven", ph:"solid", mk:"bulk"},comp:{s:"no_data",ph:"unknown",mk:""}},
-  {id:"Pb\u2085TeO\u2087",   cat:3,si:"te",exp:{s:"proven", ph:"solid", mk:"bulk"},comp:{s:"no_data",ph:"unknown",mk:""}},
-  {id:"PbTe\u2082O\u2085",   cat:3,si:"te",exp:{s:"proven", ph:"solid", mk:""},   comp:{s:"no_data",ph:"unknown",mk:""}},
-  {id:"Pb\u2082Te\u2082O\u2086",cat:3,si:"te",exp:{s:"proven",ph:"solid",mk:""},  comp:{s:"no_data",ph:"unknown",mk:""}},
-  {id:"PbTeO\u2082",         cat:3,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},  comp:{s:"no_data",ph:"unknown",mk:""}},
-  {id:"BiPbTeO",             cat:3,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},  comp:{s:"no_data",ph:"unknown",mk:""}},
+  {id:"Bi\u2082PoO\u2086",   cat:3,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""},q:"",qs:""},
+  {id:"PbPoO\u2082",         cat:3,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""},q:"",qs:""},
+  {id:"PbPoO\u2083",         cat:3,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""},q:"",qs:""},
+  {id:"PbPoO\u2084",         cat:3,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""},q:"",qs:""},
+  {id:"Pb\u2082PoO\u2084",   cat:3,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""},q:"",qs:""},
+  {id:"Pb\u2082Po\u2083O\u2088",cat:3,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""},q:"",qs:""},
+  {id:"Pb\u2082Po\u2082O\u2086",cat:3,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""},q:"",qs:""},
+  {id:"Pb\u2083PoO\u2085",   cat:3,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""},q:"",qs:""},
+  {id:"Pb\u2085PoO\u2087",   cat:3,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""},q:"",qs:""},
+  {id:"PbPo\u2082O\u2085",   cat:3,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""},q:"",qs:""},
+  {id:"BiPbPoO",             cat:3,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""},q:"",qs:""},
+  {id:"Bi\u2082TeO\u2086",   cat:3,si:"te",exp:{s:"proven", ph:"solid", mk:"bulk"},comp:{s:"no_data",ph:"unknown",mk:""},q:"",qs:""},
+  {id:"PbTeO\u2083",         cat:3,si:"te",exp:{s:"proven", ph:"solid", mk:"bulk"},comp:{s:"no_data",ph:"unknown",mk:""},
+   q:"Therefore, it can be concluded that Pb\u2082TeO\u2084\u207a and PbTeO\u2083\u207a are parent ions, formed by the ionisation of Pb\u2082TeO\u2084(g) and PbTeO\u2083(g).",qs:"Kunkel 2015"},
+  {id:"PbTeO\u2084",         cat:3,si:"te",exp:{s:"proven", ph:"solid", mk:"bulk"},comp:{s:"no_data",ph:"unknown",mk:""},q:"",qs:""},
+  {id:"Pb\u2082Te\u2083O\u2088",cat:3,si:"te",exp:{s:"proven",ph:"solid",mk:"bulk"},comp:{s:"no_data",ph:"unknown",mk:""},q:"",qs:""},
+  {id:"Pb\u2082TeO\u2084",   cat:3,si:"te",exp:{s:"proven", ph:"solid", mk:"bulk"},comp:{s:"no_data",ph:"unknown",mk:""},
+   q:"Therefore, it can be concluded that Pb\u2082TeO\u2084\u207a and PbTeO\u2083\u207a are parent ions, formed by the ionisation of Pb\u2082TeO\u2084(g) and PbTeO\u2083(g).",qs:"Kunkel 2015"},
+  {id:"Pb\u2083TeO\u2085",   cat:3,si:"te",exp:{s:"proven", ph:"solid", mk:"bulk"},comp:{s:"no_data",ph:"unknown",mk:""},q:"",qs:""},
+  {id:"Pb\u2085TeO\u2087",   cat:3,si:"te",exp:{s:"proven", ph:"solid", mk:"bulk"},comp:{s:"no_data",ph:"unknown",mk:""},q:"",qs:""},
+  {id:"PbTe\u2082O\u2085",   cat:3,si:"te",exp:{s:"proven", ph:"solid", mk:""},   comp:{s:"no_data",ph:"unknown",mk:""},
+   q:"The formation of four hitherto unknown lead tellurium oxides - PbTeO\u2083, PbTe\u2082O\u2085, Pb\u2082TeO\u2084 and Pb\u2082Te\u2082O\u2086 - was observed in the gas phase.",qs:"Kunkel 2015"},
+  {id:"Pb\u2082Te\u2082O\u2086",cat:3,si:"te",exp:{s:"proven",ph:"solid",mk:""},  comp:{s:"no_data",ph:"unknown",mk:""},
+   q:"The formula Pb\u2082Te\u2082O\u2086 is isoelectronic with well-known molecules such as As\u2084O\u2086 or Sb\u2084O\u2086.",qs:"Kunkel 2015"},
+  {id:"PbTeO\u2082",         cat:3,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},  comp:{s:"no_data",ph:"unknown",mk:""},q:"",qs:""},
+  {id:"BiPbTeO",             cat:3,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},  comp:{s:"no_data",ph:"unknown",mk:""},q:"",qs:""},
   // cat 4 Hydrides
-  {id:"PoH\u2082",cat:4,si:"po",exp:{s:"assumed",    ph:"unknown",mk:""},        comp:{s:"comp_reliable",ph:"unknown",mk:"mertens"}},
-  {id:"PoH",     cat:4,si:"po",exp:{s:"no_data",     ph:"unknown",mk:""},        comp:{s:"comp_reliable",ph:"unknown",mk:"mertens"}},
-  {id:"H\u2082Te",cat:4,si:"te",exp:{s:"proven",     ph:"gas",   mk:""},         comp:{s:"comp_dft",     ph:"decomp", mk:""}},
-  {id:"TeH",     cat:4,si:"te",exp:{s:"proven",      ph:"gas",   mk:""},         comp:{s:"comp_reliable",ph:"gas",    mk:"mertens"}},
+  {id:"PoH\u2082",cat:4,si:"po",exp:{s:"assumed",    ph:"unknown",mk:""},        comp:{s:"comp_reliable",ph:"unknown",mk:"mertens"},
+   q:"Paneth has shown that a volatile species, probably a polonium hydride, can be prepared in poor yield on the trace scale by the action of magnesium on dilute hydrochloric acid in the presence of trace polonium.",qs:"Bagnall 1962"},
+  {id:"PoH",     cat:4,si:"po",exp:{s:"no_data",     ph:"unknown",mk:""},        comp:{s:"comp_reliable",ph:"unknown",mk:"mertens"},
+   q:"The six molecules studied in this work are PoH, LiPo, PoO, PbPo, BiPo, and Po\u2082, which were all treated at the CASPT2/SO-CASSI level of theory with ANO-RCC basis sets.",qs:"Mertens 2019"},
+  {id:"H\u2082Te",cat:4,si:"te",exp:{s:"proven",     ph:"gas",   mk:""},         comp:{s:"comp_dft",     ph:"decomp", mk:""},
+   q:"The gas-phase acidity of hydrogen telluride, \u0394H\u00b0acid (H\u2082Te) = 331.3 \u00b1 0.8 kcal mol\u207b\u00b9, is obtained from ion/molecule reaction equilibria using FT-ICR mass spectrometry.",qs:"Gal et al."},
+  {id:"TeH",     cat:4,si:"te",exp:{s:"proven",      ph:"gas",   mk:""},         comp:{s:"comp_reliable",ph:"gas",    mk:"mertens"},
+   q:"Freidhoff et al. have measured the electron affinity of TeH to be EA(TeH) = 2.102 \u00b1 0.015 eV using laser photodetachment threshold measurements on TeH\u207b.",qs:"Snodgrass 1989"},
   // cat 5 Hydroxides
-  {id:"Po(OH)",    cat:5,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",     ph:"unknown",mk:""}},
-  {id:"PoH(OH)",   cat:5,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",     ph:"unknown",mk:""}},
-  {id:"PoH(OH)\u2082",cat:5,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",  ph:"unknown",mk:""}},
-  {id:"PoH(OH)\u2083",cat:5,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",  ph:"unknown",mk:""}},
-  {id:"Po(OH)\u2082",cat:5,si:"po",exp:{s:"proven", ph:"unknown",mk:""},comp:{s:"comp_reliable",ph:"decomp",mk:"koksal_bluestar"}},
-  {id:"Po(OH)\u2083",cat:5,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",   ph:"unknown",mk:""}},
-  {id:"Po(OH)\u2084",cat:5,si:"po",exp:{s:"proven", ph:"unknown",mk:""},comp:{s:"comp_reliable",ph:"unknown",mk:"koksal"}},
-  {id:"Po(OH)\u2085",cat:5,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",   ph:"unknown",mk:""}},
-  {id:"Po(OH)\u2086",cat:5,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_reliable",ph:"decomp",mk:"koksal"}},
-  {id:"PoO\u2084H\u2082",cat:5,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"unknown",mk:""}},
-  {id:"Te(OH)",    cat:5,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",     ph:"unknown",mk:""}},
-  {id:"TeH(OH)",   cat:5,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",     ph:"unknown",mk:""}},
-  {id:"TeH(OH)\u2082",cat:5,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",  ph:"unknown",mk:""}},
-  {id:"TeH(OH)\u2083",cat:5,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",  ph:"unknown",mk:""}},
-  {id:"Te(OH)\u2082",cat:5,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",   ph:"unknown",mk:""}},
-  {id:"Te(OH)\u2083",cat:5,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",   ph:"unknown",mk:""}},
-  {id:"Te(OH)\u2084",cat:5,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_reliable",ph:"unknown",mk:"koksal"}},
-  {id:"Te(OH)\u2085",cat:5,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",   ph:"unknown",mk:""}},
-  {id:"Te(OH)\u2086",cat:5,si:"te",exp:{s:"proven", ph:"unknown",mk:""},comp:{s:"comp_reliable",ph:"unknown",mk:"koksal"}},
-  {id:"TeO\u2084H\u2082",cat:5,si:"te",exp:{s:"proven",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"unknown",mk:""}},
+  {id:"Po(OH)",    cat:5,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",     ph:"unknown",mk:""},q:"",qs:""},
+  {id:"PoH(OH)",   cat:5,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",     ph:"unknown",mk:""},q:"",qs:""},
+  {id:"PoH(OH)\u2082",cat:5,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",  ph:"unknown",mk:""},q:"",qs:""},
+  {id:"PoH(OH)\u2083",cat:5,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",  ph:"unknown",mk:""},q:"",qs:""},
+  {id:"Po(OH)\u2082",cat:5,si:"po",exp:{s:"proven", ph:"unknown",mk:""},comp:{s:"comp_reliable",ph:"decomp",mk:"koksal_bluestar"},
+   q:"A dark brown precipitate is obtained when alkali is added to a freshly prepared solution of bipositive polonium; the precipitate is rapidly oxidized to quadripositive polonium on standing.",qs:"Bagnall 1962"},
+  {id:"Po(OH)\u2083",cat:5,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",   ph:"unknown",mk:""},q:"",qs:""},
+  {id:"Po(OH)\u2084",cat:5,si:"po",exp:{s:"proven", ph:"unknown",mk:""},comp:{s:"comp_reliable",ph:"unknown",mk:"koksal"},
+   q:"Compound A is readily decomposed by water, dilute aqueous potassium hydroxide, or dilute hydrochloric acid, giving the quadrivalent hydroxide or chloride. It decomposes to B below 100\u00b0 and B decomposes to polonium dioxide at about 130\u00b0.",qs:"Bagnall 1958"},
+  {id:"Po(OH)\u2085",cat:5,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",   ph:"unknown",mk:""},q:"",qs:""},
+  {id:"Po(OH)\u2086",cat:5,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_reliable",ph:"decomp",mk:"koksal"},
+   q:"Po(OH)\u2086 is thermodynamically unstable: SO-CASSI + ML correction gives \u0394Eform = +31.7 kJ/mol (positive = endothermic from elements). DFT gives -211.4 kJ/mol (sign flip).",qs:"Köksal 2025"},
+  {id:"PoO\u2084H\u2082",cat:5,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"unknown",mk:""},q:"",qs:""},
+  {id:"Te(OH)",    cat:5,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",     ph:"unknown",mk:""},q:"",qs:""},
+  {id:"TeH(OH)",   cat:5,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",     ph:"unknown",mk:""},q:"",qs:""},
+  {id:"TeH(OH)\u2082",cat:5,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",  ph:"unknown",mk:""},q:"",qs:""},
+  {id:"TeH(OH)\u2083",cat:5,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",  ph:"unknown",mk:""},q:"",qs:""},
+  {id:"Te(OH)\u2082",cat:5,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",   ph:"unknown",mk:""},q:"",qs:""},
+  {id:"Te(OH)\u2083",cat:5,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",   ph:"unknown",mk:""},q:"",qs:""},
+  {id:"Te(OH)\u2084",cat:5,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_reliable",ph:"unknown",mk:"koksal"},
+   q:"Te(OH)\u2084 is a stable gas-phase molecule. De = 147.3 kJ/mol (SO-CASSI+ML level).",qs:"Köksal 2025"},
+  {id:"Te(OH)\u2085",cat:5,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",   ph:"unknown",mk:""},q:"",qs:""},
+  {id:"Te(OH)\u2086",cat:5,si:"te",exp:{s:"proven", ph:"unknown",mk:""},comp:{s:"comp_reliable",ph:"unknown",mk:"koksal"},
+   q:"Orthotelluric acid (monoclinic modification) begins to decompose at 140\u00b0 with liberation of water, the last portion of which escapes as late as immediately before the crystallization of the product to form Te\u2082O\u2085.",qs:"Fabry"},
+  {id:"TeO\u2084H\u2082",cat:5,si:"te",exp:{s:"proven",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"unknown",mk:""},q:"",qs:""},
   // cat 6 Oxo-hydroxides
-  {id:"PoO(OH)",    cat:6,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"unknown",mk:""}},
-  {id:"PoO(OH)\u2082",cat:6,si:"po",exp:{s:"assumed",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"unknown",mk:""}},
-  {id:"PoO\u2082(OH)\u2082",cat:6,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"unknown",mk:""}},
-  {id:"PoO\u2082(OH)",cat:6,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"unknown",mk:""}},
-  {id:"PoO\u2083(OH)",cat:6,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"decomp",mk:""}},
-  {id:"PoO(OH)\u2083",cat:6,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"unknown",mk:""}},
-  {id:"PoO\u2084(OH)",cat:6,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"decomp",mk:""}},
-  {id:"PoO\u2083(OH)\u2082",cat:6,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"unknown",mk:""}},
-  {id:"PoO\u2082(OH)\u2083",cat:6,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"unknown",mk:""}},
-  {id:"PoO(OH)\u2084",cat:6,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"unknown",mk:""}},
-  {id:"PoO\u2085(OH)",cat:6,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"decomp",mk:""}},
-  {id:"PoO\u2084(OH)\u2082",cat:6,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"decomp",mk:""}},
-  {id:"PoO\u2083(OH)\u2083",cat:6,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"unknown",mk:""}},
-  {id:"PoO\u2082(OH)\u2084",cat:6,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"unknown",mk:""}},
-  {id:"PoO(OH)\u2085",cat:6,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"unknown",mk:""}},
-  {id:"TeO(OH)",    cat:6,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"unknown",mk:""}},
-  {id:"TeO(OH)\u2082",cat:6,si:"te",exp:{s:"assumed",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"unknown",mk:""}},
-  {id:"TeO\u2082(OH)\u2082",cat:6,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"unknown",mk:""}},
-  {id:"TeO\u2082(OH)",cat:6,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"unknown",mk:""}},
-  {id:"TeO\u2083(OH)",cat:6,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"unknown",mk:""}},
-  {id:"TeO(OH)\u2083",cat:6,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"unknown",mk:""}},
-  {id:"TeO\u2084(OH)",cat:6,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"decomp",mk:""}},
-  {id:"TeO\u2083(OH)\u2082",cat:6,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"unknown",mk:""}},
-  {id:"TeO\u2082(OH)\u2083",cat:6,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"unknown",mk:""}},
-  {id:"TeO(OH)\u2084",cat:6,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"unknown",mk:""}},
-  {id:"TeO\u2085(OH)",cat:6,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"decomp",mk:""}},
-  {id:"TeO\u2084(OH)\u2082",cat:6,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"decomp",mk:""}},
-  {id:"TeO\u2083(OH)\u2083",cat:6,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"unknown",mk:""}},
-  {id:"TeO\u2082(OH)\u2084",cat:6,si:"te",exp:{s:"proven", ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"unknown",mk:""}},
-  {id:"TeO(OH)\u2085",cat:6,si:"te",exp:{s:"proven", ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"unknown",mk:""}},
+  {id:"PoO(OH)",    cat:6,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"unknown",mk:""},q:"",qs:""},
+  {id:"PoO(OH)\u2082",cat:6,si:"po",exp:{s:"assumed",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"unknown",mk:""},
+   q:"In slightly acidic or neutral media, PoO(OH)\u207a, PoO(OH)\u2082 and PoO\u2082 prevail, whereas, in alkaline media, PoO\u2083\u00b2\u207b predominates.",qs:"Ulrich & Degueldre 1993"},
+  {id:"PoO\u2082(OH)\u2082",cat:6,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"unknown",mk:""},q:"",qs:""},
+  {id:"PoO\u2082(OH)",cat:6,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"unknown",mk:""},q:"",qs:""},
+  {id:"PoO\u2083(OH)",cat:6,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"decomp",mk:""},q:"",qs:""},
+  {id:"PoO(OH)\u2083",cat:6,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"unknown",mk:""},q:"",qs:""},
+  {id:"PoO\u2084(OH)",cat:6,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"decomp",mk:""},q:"",qs:""},
+  {id:"PoO\u2083(OH)\u2082",cat:6,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"unknown",mk:""},q:"",qs:""},
+  {id:"PoO\u2082(OH)\u2083",cat:6,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"unknown",mk:""},q:"",qs:""},
+  {id:"PoO(OH)\u2084",cat:6,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"unknown",mk:""},q:"",qs:""},
+  {id:"PoO\u2085(OH)",cat:6,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"decomp",mk:""},q:"",qs:""},
+  {id:"PoO\u2084(OH)\u2082",cat:6,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"decomp",mk:""},q:"",qs:""},
+  {id:"PoO\u2083(OH)\u2083",cat:6,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"unknown",mk:""},q:"",qs:""},
+  {id:"PoO\u2082(OH)\u2084",cat:6,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"unknown",mk:""},q:"",qs:""},
+  {id:"PoO(OH)\u2085",cat:6,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"unknown",mk:""},q:"",qs:""},
+  {id:"TeO(OH)",    cat:6,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"unknown",mk:""},q:"",qs:""},
+  {id:"TeO(OH)\u2082",cat:6,si:"te",exp:{s:"assumed",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"unknown",mk:""},
+   q:"The results confirm previous findings that a gaseous hydroxide of the formula TeO(OH)\u2082 is formed in the vapour. No indications for the formation of other species have been found.",qs:"Konings 1990"},
+  {id:"TeO\u2082(OH)\u2082",cat:6,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"unknown",mk:""},q:"",qs:""},
+  {id:"TeO\u2082(OH)",cat:6,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"unknown",mk:""},q:"",qs:""},
+  {id:"TeO\u2083(OH)",cat:6,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"unknown",mk:""},q:"",qs:""},
+  {id:"TeO(OH)\u2083",cat:6,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"unknown",mk:""},q:"",qs:""},
+  {id:"TeO\u2084(OH)",cat:6,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"decomp",mk:""},q:"",qs:""},
+  {id:"TeO\u2083(OH)\u2082",cat:6,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"unknown",mk:""},q:"",qs:""},
+  {id:"TeO\u2082(OH)\u2083",cat:6,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"unknown",mk:""},q:"",qs:""},
+  {id:"TeO(OH)\u2084",cat:6,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"unknown",mk:""},q:"",qs:""},
+  {id:"TeO\u2085(OH)",cat:6,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"decomp",mk:""},q:"",qs:""},
+  {id:"TeO\u2084(OH)\u2082",cat:6,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"decomp",mk:""},q:"",qs:""},
+  {id:"TeO\u2083(OH)\u2083",cat:6,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"unknown",mk:""},q:"",qs:""},
+  {id:"TeO\u2082(OH)\u2084",cat:6,si:"te",exp:{s:"proven", ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"unknown",mk:""},q:"",qs:""},
+  {id:"TeO(OH)\u2085",cat:6,si:"te",exp:{s:"proven", ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"unknown",mk:""},q:"",qs:""},
   // cat 7 Bi/Pb hydrides
-  {id:"BiPoH",cat:7,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""}},
-  {id:"PbPoH",cat:7,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""}},
-  {id:"BiTeH",cat:7,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""}},
-  {id:"PbTeH",cat:7,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""}},
+  {id:"BiPoH",cat:7,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""},q:"",qs:""},
+  {id:"PbPoH",cat:7,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""},q:"",qs:""},
+  {id:"BiTeH",cat:7,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""},q:"",qs:""},
+  {id:"PbTeH",cat:7,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""},q:"",qs:""},
   // cat 8 Bi/Pb hydroxides
-  {id:"BiPo(OH)\u2084",cat:8,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""}},
-  {id:"PbPo(OH)\u2084",cat:8,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""}},
-  {id:"BiTe(OH)\u2084",cat:8,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""}},
-  {id:"PbTe(OH)\u2084",cat:8,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""}},
+  {id:"BiPo(OH)\u2084",cat:8,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""},q:"",qs:""},
+  {id:"PbPo(OH)\u2084",cat:8,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""},q:"",qs:""},
+  {id:"BiTe(OH)\u2084",cat:8,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""},q:"",qs:""},
+  {id:"PbTe(OH)\u2084",cat:8,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""},q:"",qs:""},
   // cat 9 Organics
-  {id:"Po(C\u2082O\u2084)\u2082",cat:9,si:"po",exp:{s:"proven", ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""}},
-  {id:"Po(C\u2086H\u2085)\u2082",cat:9,si:"po",exp:{s:"assumed",ph:"decomp", mk:""},comp:{s:"no_data",ph:"unknown",mk:""}},
-  {id:"Te(C\u2082O\u2084)\u2082",cat:9,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""}},
-  {id:"Te(C\u2086H\u2085)\u2082",cat:9,si:"te",exp:{s:"proven", ph:"decomp", mk:""},comp:{s:"no_data",ph:"unknown",mk:""}},
+  {id:"Po(C\u2082O\u2084)\u2082",cat:9,si:"po",exp:{s:"proven", ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""},
+   q:"Polonium(IV) oxalate is formed when polonium hydroxide is treated with oxalic acid.",qs:"Bagnall 1962"},
+  {id:"Po(C\u2086H\u2085)\u2082",cat:9,si:"po",exp:{s:"assumed",ph:"decomp", mk:""},comp:{s:"no_data",ph:"unknown",mk:""},
+   q:"Even the 'stable' organic polonium compounds charred rapidly due to the intense alpha radiation.",qs:"Bagnall 1962"},
+  {id:"Te(C\u2082O\u2084)\u2082",cat:9,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""},q:"",qs:""},
+  {id:"Te(C\u2086H\u2085)\u2082",cat:9,si:"te",exp:{s:"proven", ph:"decomp", mk:""},comp:{s:"no_data",ph:"unknown",mk:""},q:"",qs:""},
 ];
 
 /* ═══ LABEL MAPS ═══ */
 const EXP_LBL  = {proven:"Exp. proven",assumed:"Exp. assumed / inferred",no_data:"No data"};
 const COMP_LBL = {comp_reliable:"SO-CASSI / CASPT2 / CCSD(T)",comp_dft:"DFT only (unreliable for Po)",comp_unstable:"Computationally unstable",no_data:"No data"};
 const PHASE_LBL= {solid:"Solid",liquid:"Liquid",gas:"Gas",decomp:"Decomposes at MYRRHA T",unknown:"Unknown"};
-const MK_LBL   = {"mertens":"Mertens 2019","mertens_star":"Mertens 2019 (dominant volatile, O\u2082-free cover gas)","koksal":"K\u00f6ksal 2025","koksal_bluestar":"K\u00f6ksal 2025 (dominant outdoor species < 471 K)","bulk":"Bulk solid data only","":" \u2014 "};
+const MK_LBL   = {"mertens":"Mertens 2019","mertens_star":"Mertens 2019 (dominant volatile, O\u2082-free cover gas)","koksal":"K\u00f6ksal 2025","koksal_bluestar":"K\u00f6ksal 2025 (dominant outdoor species < 471 K)","bulk":"Bulk solid data only","":"-"};
 const MK_SYM   = {"mertens":{s:"M",c:"#333"},"mertens_star":{s:"\u2605",c:"#c8900a"},"koksal":{s:"K",c:"#333"},"koksal_bluestar":{s:"\u2605",c:"#2980b9"},"bulk":{s:"b",c:"#333"},"":{s:"",c:""}};
 const EXP_CLR  = {proven:{bg:"#a9dfbf",bd:"#1e8449",tx:"#145a32"},assumed:{bg:"#f9e79f",bd:"#d4ac0d",tx:"#7d6608"},no_data:{bg:"#e8e8e8",bd:"#aaaaaa",tx:"#666"}};
 const COMP_CLR = {comp_reliable:{bg:"#d6eaf8",bd:"#2980b9",tx:"#1a5276"},comp_dft:{bg:"#fdebd0",bd:"#e67e22",tx:"#784212"},comp_unstable:{bg:"#d5d8dc",bd:"#7f8c8d",tx:"#555"},no_data:{bg:"#e8e8e8",bd:"#aaaaaa",tx:"#666"}};
@@ -341,6 +380,9 @@ function checkPw() {
 function showApp() {
   document.getElementById('app').style.display = 'block';
   setView('exp');
+  const url = window.location.href.split('?')[0].split('#')[0];
+  document.getElementById('qr-img').src =
+    'https://api.qrserver.com/v1/create-qr-code/?size=120x120&data=' + encodeURIComponent(url);
 }
 
 /* ═══ TOGGLE ═══ */
@@ -349,8 +391,8 @@ function setView(v) {
   document.getElementById('btn-exp').classList.toggle('active', v==='exp');
   document.getElementById('btn-comp').classList.toggle('active', v==='comp');
   document.getElementById('fig-title').textContent = v==='exp'
-    ? "Experimental Knowledge of Po/Te Candidate Molecules"
-    : "Computational Knowledge of Po/Te Candidate Molecules";
+    ? "Experimental Knowledge of Po/Te Containing Molecules"
+    : "Computational Knowledge of Po/Te Containing Molecules";
   document.getElementById('fig-subtitle').textContent = v==='exp'
     ? "Knowledge gaps shown in gray"
     : "Experimental data excluded; computational evidence only";
@@ -392,16 +434,14 @@ function buildPill(mol) {
   const phCls = ['solid','gas','liquid'].includes(d.ph) ? 'phase-'+d.ph : '';
   btn.className = ['pill','pill-'+d.s, phCls].filter(Boolean).join(' ');
   btn.dataset.id = mol.id;
-  // left badge
-  let hasL = false;
-  if (d.s==='comp_unstable') {
-    const x=document.createElement('span'); x.className='pill-badge-l pill-cross'; x.textContent='\u2717'; btn.appendChild(x); hasL=true;
-  } else if (d.ph==='decomp') {
-    const x=document.createElement('span'); x.className='pill-badge-l'; x.textContent='D'; btn.appendChild(x); hasL=true;
-  }
-  if (hasL) btn.classList.add('has-lbadge');
   // label
   const lbl=document.createElement('span'); lbl.className='pill-lbl'; lbl.textContent=mol.id; btn.appendChild(lbl);
+  // superscript badges
+  if (d.s==='comp_unstable') {
+    const sup=document.createElement('sup'); sup.className='pill-decomp pill-cross'; sup.textContent='\u2717'; btn.appendChild(sup);
+  } else if (d.ph==='decomp') {
+    const sup=document.createElement('sup'); sup.className='pill-decomp'; sup.textContent='D'; btn.appendChild(sup);
+  }
   // right marker
   const mk = MK_SYM[d.mk]||{s:'',c:''};
   if (mk.s) {
@@ -444,9 +484,18 @@ function openModal(mol) {
   document.getElementById('mc-exp').innerHTML = `<span class="status-badge" style="background:${ec.bg};border-color:${ec.bd};color:${ec.tx}">${EXP_LBL[mol.exp.s]}</span>`;
   const cc=COMP_CLR[mol.comp.s]||COMP_CLR.no_data;
   document.getElementById('mc-comp').innerHTML = `<span class="status-badge" style="background:${cc.bg};border-color:${cc.bd};color:${cc.tx}">${COMP_LBL[mol.comp.s]}</span>`;
-  const d = VIEW==='exp' ? mol.exp : mol.comp;
-  document.getElementById('mc-phase').textContent = PHASE_LBL[d.ph];
-  document.getElementById('mc-ref').textContent   = MK_LBL[d.mk]!==undefined ? MK_LBL[d.mk] : (d.mk||'—');
+  document.getElementById('mc-phase-exp').textContent  = PHASE_LBL[mol.exp.ph];
+  document.getElementById('mc-phase-comp').textContent = PHASE_LBL[mol.comp.ph];
+  const ref = mol.exp.mk ? (MK_LBL[mol.exp.mk]||mol.exp.mk)
+            : mol.comp.mk ? (MK_LBL[mol.comp.mk]||mol.comp.mk) : '-';
+  document.getElementById('mc-ref').textContent = ref;
+  const hasQ = mol.q && mol.q.length > 0;
+  document.getElementById('mc-quote-row').style.display    = hasQ ? '' : 'none';
+  document.getElementById('mc-quoteref-row').style.display = hasQ ? '' : 'none';
+  if (hasQ) {
+    document.getElementById('mc-quote').textContent    = '\u201c' + mol.q + '\u201d';
+    document.getElementById('mc-quoteref').textContent = '- ' + mol.qs;
+  }
   document.getElementById('modal-overlay').style.display='flex';
   document.getElementById('modal-close').focus();
 }
@@ -484,7 +533,7 @@ function mkLegSec(title, items) {
   items.forEach(it=>{
     const p=document.createElement('div'); p.className='legend-pill';
     const sw=document.createElement('div'); sw.className='legend-swatch'+(it.hatch?' dft-h':'');
-    sw.style.background=it.bg; sw.style.borderColor=it.bd; p.appendChild(sw);
+    sw.style.backgroundColor=it.bg; sw.style.borderColor=it.bd; p.appendChild(sw);
     const l=document.createElement('span'); l.className='legend-label'; l.textContent=it.lbl; p.appendChild(l);
     row.appendChild(p);
   });
@@ -497,7 +546,7 @@ function mkPhaseLeg() {
   [['solid','Solid'],['gas','Gas'],['liquid','Liquid'],['','Unknown']].forEach(([ph,lbl])=>{
     const p=document.createElement('div'); p.className='legend-pill';
     const sw=document.createElement('div'); sw.className='legend-swatch'+(ph?' ls-'+ph:'');
-    sw.style.background='#e8e8e8'; sw.style.borderColor='#aaaaaa'; p.appendChild(sw);
+    sw.style.backgroundColor='#e8e8e8'; sw.style.borderColor='#aaaaaa'; p.appendChild(sw);
     const l=document.createElement('span'); l.className='legend-label'; l.textContent=lbl; p.appendChild(l);
     row.appendChild(p);
   });
