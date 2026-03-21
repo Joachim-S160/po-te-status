@@ -163,9 +163,9 @@ header{text-align:center;margin-bottom:14px}
       <tr><th>Comp. evidence</th><td id="mc-comp"></td></tr>
       <tr><th>Exp. phase</th><td id="mc-phase-exp"></td></tr>
       <tr><th>Comp. phase</th><td id="mc-phase-comp"></td></tr>
-      <tr><th>Reference</th><td id="mc-ref"></td></tr>
+      <tr><th>Exp. ref.</th><td id="mc-ref-exp"></td></tr>
+      <tr><th>Comp. ref.</th><td id="mc-ref-comp"></td></tr>
       <tr id="mc-quote-row" style="display:none"><th style="white-space:normal;padding-right:10px;vertical-align:top">Key quote</th><td id="mc-quote" style="font-style:italic;font-size:.84rem;color:#444;border-left:3px solid #e0e0e0;padding-left:8px"></td></tr>
-      <tr id="mc-quoteref-row" style="display:none"><th></th><td id="mc-quoteref" style="font-size:.78rem;color:#888;padding-top:2px"></td></tr>
     </table>
   </div>
 </div>
@@ -352,7 +352,7 @@ const M = [
 const EXP_LBL  = {proven:"Exp. proven",assumed:"Exp. assumed / inferred",no_data:"No data"};
 const COMP_LBL = {comp_reliable:"SO-CASSI / CASPT2 / CCSD(T)",comp_dft:"DFT only (unreliable for Po)",comp_unstable:"Computationally unstable",no_data:"No data"};
 const PHASE_LBL= {solid:"Solid",liquid:"Liquid",gas:"Gas",decomp:"Decomposes at MYRRHA T",unknown:"Unknown"};
-const MK_LBL   = {"mertens":"Mertens 2019","mertens_star":"Mertens 2019 (dominant volatile, O\u2082-free cover gas)","koksal":"K\u00f6ksal 2025","koksal_bluestar":"K\u00f6ksal 2025 (dominant outdoor species < 471 K)","bulk":"Bulk solid data only","":"-"};
+const MK_LBL   = {"mertens":"Mertens 2019","mertens_star":"Mertens 2019 (dominant volatile, O\u2082-free cover gas)","koksal":"K\u00f6ksal 2025","koksal_bluestar":"Mertens thesis (dominant outdoor species < 471 K)","bulk":"Bulk solid data only","":"-"};
 const MK_SYM   = {"mertens":{s:"M",c:"#333"},"mertens_star":{s:"\u2605",c:"#c8900a"},"koksal":{s:"K",c:"#333"},"koksal_bluestar":{s:"\u2605",c:"#2980b9"},"bulk":{s:"b",c:"#333"},"":{s:"",c:""}};
 const EXP_CLR  = {proven:{bg:"#a9dfbf",bd:"#1e8449",tx:"#145a32"},assumed:{bg:"#f9e79f",bd:"#d4ac0d",tx:"#7d6608"},no_data:{bg:"#e8e8e8",bd:"#aaaaaa",tx:"#666"}};
 const COMP_CLR = {comp_reliable:{bg:"#d6eaf8",bd:"#2980b9",tx:"#1a5276"},comp_dft:{bg:"#fdebd0",bd:"#e67e22",tx:"#784212"},comp_unstable:{bg:"#d5d8dc",bd:"#7f8c8d",tx:"#555"},no_data:{bg:"#e8e8e8",bd:"#aaaaaa",tx:"#666"}};
@@ -484,15 +484,14 @@ function openModal(mol) {
   document.getElementById('mc-comp').innerHTML = `<span class="status-badge" style="background:${cc.bg};border-color:${cc.bd};color:${cc.tx}">${COMP_LBL[mol.comp.s]}</span>`;
   document.getElementById('mc-phase-exp').textContent  = PHASE_LBL[mol.exp.ph];
   document.getElementById('mc-phase-comp').textContent = PHASE_LBL[mol.comp.ph];
-  const ref = mol.exp.mk ? (MK_LBL[mol.exp.mk]||mol.exp.mk)
-            : mol.comp.mk ? (MK_LBL[mol.comp.mk]||mol.comp.mk) : '-';
-  document.getElementById('mc-ref').textContent = ref;
+  const expRef = mol.qs ? mol.qs : mol.exp.mk ? (MK_LBL[mol.exp.mk]||mol.exp.mk) : '-';
+  document.getElementById('mc-ref-exp').textContent = expRef;
+  const compRef = mol.comp.mk ? (MK_LBL[mol.comp.mk]||mol.comp.mk) : '-';
+  document.getElementById('mc-ref-comp').textContent = compRef;
   const hasQ = mol.q && mol.q.length > 0;
-  document.getElementById('mc-quote-row').style.display    = hasQ ? '' : 'none';
-  document.getElementById('mc-quoteref-row').style.display = hasQ ? '' : 'none';
+  document.getElementById('mc-quote-row').style.display = hasQ ? '' : 'none';
   if (hasQ) {
-    document.getElementById('mc-quote').textContent    = '\u201c' + mol.q + '\u201d';
-    document.getElementById('mc-quoteref').textContent = '- ' + mol.qs;
+    document.getElementById('mc-quote').textContent = '\u201c' + mol.q + '\u201d';
   }
   document.getElementById('modal-overlay').style.display='flex';
   document.getElementById('modal-close').focus();
