@@ -77,10 +77,9 @@ header{text-align:center;margin-bottom:14px}
 /* badge spans inside pill must be above overlays */
 .pill>span{position:relative;z-index:2}
 .pill-lbl{display:inline-block}
-.pill-marker{position:absolute;top:0;right:2px;font-size:.58em;font-weight:700;line-height:1;z-index:3}
+.pill-marker{display:inline;font-size:.58em;font-weight:700;vertical-align:super;margin-left:1px;position:relative;z-index:3}
 .pill-decomp{font-size:.58em;font-weight:700;color:#555;vertical-align:super;margin-left:1px;position:relative;z-index:2}
 .pill-cross{color:#c0392b}
-.pill.has-rmarker{padding-right:17px}
 
 /* ── Tooltip ── */
 #tooltip{position:fixed;display:none;background:#1a1a2e;color:#fff;font-size:.76rem;font-weight:600;padding:5px 11px;border-radius:6px;pointer-events:none;z-index:500;white-space:nowrap;box-shadow:0 4px 14px rgba(0,0,0,.35)}
@@ -445,8 +444,7 @@ function buildPill(mol) {
   // right marker
   const mk = MK_SYM[d.mk]||{s:'',c:''};
   if (mk.s) {
-    const ms=document.createElement('span'); ms.className='pill-marker'; ms.style.color=mk.c; ms.textContent=mk.s; btn.appendChild(ms);
-    btn.classList.add('has-rmarker');
+    const ms=document.createElement('sup'); ms.className='pill-marker'; ms.style.color=mk.c; ms.textContent=mk.s; btn.appendChild(ms);
   }
   btn.addEventListener('mouseenter', e=>showTip(e,mol));
   btn.addEventListener('mouseleave', hideTip);
