@@ -351,7 +351,7 @@ const M = [
 
 /* ═══ LABEL MAPS ═══ */
 const EXP_LBL  = {proven:"Exp. proven",assumed:"Exp. assumed / inferred",no_data:"No data"};
-const COMP_LBL = {comp_reliable:"SO-CASSI / CASPT2 / CCSD(T)",comp_dft:"DFT only (unreliable for Po)",comp_unstable:"Computationally unstable",no_data:"No data"};
+const COMP_LBL = {comp_reliable:"SO-CASSI / CASPT2 / CCSD(T)",comp_dft:"DFT (Cottenier group)",comp_unstable:"Computationally unstable",no_data:"No data"};
 const PHASE_LBL= {solid:"Solid",liquid:"Liquid",gas:"Gas",decomp:"Decomposes at MYRRHA T",unknown:"Unknown"};
 const MK_LBL   = {"mertens":"Mertens 2019","mertens_star":"Mertens 2019 (dominant volatile, O\u2082-free cover gas)","koksal":"K\u00f6ksal 2025","koksal_bluestar":"Mertens thesis (dominant outdoor species < 471 K)","bulk":"Bulk solid data only","":"-"};
 const MK_SYM   = {"mertens":{s:"M",c:"#333"},"mertens_star":{s:"\u2605",c:"#c8900a"},"koksal":{s:"K",c:"#333"},"koksal_bluestar":{s:"\u2605",c:"#2980b9"},"bulk":{s:"b",c:"#333"},"":{s:"",c:""}};
@@ -513,11 +513,9 @@ function renderLegend() {
   } else {
     leg.appendChild(mkLegSec('Computational evidence',[
       {bg:'#d6eaf8',bd:'#2980b9',lbl:'SO-CASSI / CASPT2',hatch:false},
-      {bg:'#fdebd0',bd:'#e67e22',lbl:'DFT only',hatch:true},
+      {bg:'#fdebd0',bd:'#e67e22',lbl:'DFT (Cottenier group)',hatch:true},
       {bg:'#e8e8e8',bd:'#aaaaaa',lbl:'No data'},
     ]));
-    const w=document.createElement('div'); w.className='legend-note';
-    w.textContent='DFT results are unreliable for Po without spin-orbit coupling'; leg.appendChild(w);
     const s=document.createElement('div'); s.className='legend-footnote';
     s.innerHTML='<span class="legend-star" style="color:#c8900a">\u2605</span> dominant volatile in O\u2082-free reactor cover gas (Mertens 2019)\u2003<span class="legend-star" style="color:#2980b9">\u2605</span> dominant outdoor species below 471\u202fK (Mertens thesis)';
     leg.appendChild(s);
