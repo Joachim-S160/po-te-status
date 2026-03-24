@@ -65,8 +65,6 @@ header{text-align:center;margin-bottom:14px}
 .pill-comp_dft     {background:#fdebd0;border-color:#e67e22;color:#784212}
 .pill-comp_unstable{background:#d5d8dc;border-color:#7f8c8d;color:#555}
 
-/* DFT diagonal hatch */
-.pill-comp_dft::after{content:'';position:absolute;inset:0;border-radius:4px;background-image:repeating-linear-gradient(-45deg,#e6720044 0,#e6720044 1.5px,transparent 1.5px,transparent 6px);pointer-events:none;z-index:1}
 
 /* phase hatch (::before, z-index 1) */
 .phase-solid::before,.phase-gas::before,.phase-liquid::before{content:'';position:absolute;inset:0;border-radius:4px;pointer-events:none;z-index:1}
@@ -101,9 +99,7 @@ header{text-align:center;margin-bottom:14px}
 .legend-title{font-weight:700;font-size:.88rem;color:#333;margin-bottom:7px}
 .legend-row{display:flex;flex-wrap:wrap;justify-content:center;gap:10px 16px;align-items:center}
 .legend-pill{display:inline-flex;align-items:center;gap:6px}
-.legend-swatch{width:30px;height:18px;border-radius:4px;border:1.5px solid;position:relative;overflow:hidden;flex-shrink:0}
-.legend-swatch.dft-h::after{content:'';position:absolute;inset:0;background-image:repeating-linear-gradient(-45deg,#e6720044 0,#e6720044 1.5px,transparent 1.5px,transparent 6px)}
-.ls-solid{background-image:repeating-linear-gradient(45deg,#77777730 0,#77777730 1.5px,transparent 1.5px,transparent 6px)}
+.legend-swatch{width:30px;height:18px;border-radius:4px;border:1.5px solid;position:relative;overflow:hidden;flex-shrink:0}.ls-solid{background-image:repeating-linear-gradient(45deg,#77777730 0,#77777730 1.5px,transparent 1.5px,transparent 6px)}
 .ls-gas{background-image:radial-gradient(circle,#77777730 1.5px,transparent 1.5px) 0 0/7px 7px}
 .ls-liquid{background-image:repeating-linear-gradient(0deg,#77777730 0,#77777730 1.5px,transparent 1.5px,transparent 6px)}
 .legend-label{color:#444}
@@ -185,15 +181,15 @@ const M = [
   // cat 0 Diatomics
   {id:"BiPo",      cat:0,si:"po",exp:{s:"no_data",    ph:"unknown",mk:""},        comp:{s:"comp_reliable",ph:"unknown",mk:"mertens"},
    q:"The six molecules studied in this work are PoH, LiPo, PoO, PbPo, BiPo, and Po\u2082, which were all treated at the CASPT2/SO-CASSI level of theory with ANO-RCC basis sets.",qs:"Mertens 2019"},
-  {id:"Po\u2082",  cat:0,si:"po",exp:{s:"proven",     ph:"gas",   mk:""},        comp:{s:"comp_reliable",ph:"gas",   mk:"mertens"},
+  {id:"Po\u2082",  cat:0,si:"po",exp:{s:"proven",     ph:"gas",   mk:""},        comp:{s:"comp_reliable",ph:"assumed_gas",mk:"mertens"},
    q:"The only Po-containing molecule for which an experimental dissociation energy has been reported is Po\u2082 (1.90 eV) in 1957 by Charles et al.",qs:"Mertens 2019"},
-  {id:"PbPo",      cat:0,si:"po",exp:{s:"proven",     ph:"solid", mk:""},        comp:{s:"comp_reliable",ph:"gas",   mk:"mertens_star"},
+  {id:"PbPo",      cat:0,si:"po",exp:{s:"proven",     ph:"solid", mk:""},        comp:{s:"comp_reliable",ph:"assumed_gas",mk:"mertens_star"},
    q:"Zinc polonide sublimes at 400\u00b0C and the silver, lead, and platinum compounds decompose at about 600\u00b0C.",qs:"Bagnall 1962"},
-  {id:"BiTe",      cat:0,si:"te",exp:{s:"proven",     ph:"solid", mk:""},        comp:{s:"comp_reliable",ph:"solid", mk:"mertens"},
+  {id:"BiTe",      cat:0,si:"te",exp:{s:"proven",     ph:"solid", mk:""},        comp:{s:"comp_reliable",ph:"assumed_gas",mk:"mertens"},
    q:"Liquid + Bi\u2082Te\u2083 \u2194 BiTe, Reaction temperature 559.5 \u00b0C, Peritectic.",qs:"Drzewowska & Onderka 2023"},
-  {id:"Te\u2082",  cat:0,si:"te",exp:{s:"proven",     ph:"gas",   mk:""},        comp:{s:"comp_reliable",ph:"gas",   mk:"mertens"},
+  {id:"Te\u2082",  cat:0,si:"te",exp:{s:"proven",     ph:"gas",   mk:""},        comp:{s:"comp_reliable",ph:"assumed_gas",mk:"mertens"},
    q:"The Te\u2082\u207b photoelectron spectrum consists of a structured band extending from approximately 1.6 to 2.5 eV electron kinetic energy... EA(Te\u2082) = 1.92 \u00b1 0.07 eV.",qs:"Snodgrass 1989"},
-  {id:"PbTe",      cat:0,si:"te",exp:{s:"proven",     ph:"solid", mk:""},        comp:{s:"comp_reliable",ph:"solid", mk:"mertens"},q:"",qs:""},
+  {id:"PbTe",      cat:0,si:"te",exp:{s:"proven",     ph:"solid", mk:""},        comp:{s:"comp_reliable",ph:"assumed_gas",mk:"mertens"},q:"",qs:""},
   // cat 1 Triatomics
   {id:"Po\u2083",             cat:1,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""},q:"",qs:""},
   {id:"Bi\u2082Po",           cat:1,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""},q:"",qs:""},
@@ -210,9 +206,9 @@ const M = [
    q:"Liquid + Bi\u2082Te \u2194 Bi\u2087Te\u2083, Reaction temperature 316.9 \u00b0C, Peritectic.",qs:"Drzewowska & Onderka 2023"},
   {id:"BiPbTe",               cat:1,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""},q:"",qs:""},
   // cat 2 Pure oxides
-  {id:"PoO",       cat:2,si:"po",exp:{s:"assumed",    ph:"unknown",mk:""},       comp:{s:"comp_reliable",ph:"gas",   mk:"mertens"},
+  {id:"PoO",       cat:2,si:"po",exp:{s:"assumed",    ph:"unknown",mk:""},       comp:{s:"comp_reliable",ph:"assumed_gas",mk:"mertens"},
    q:"The black monoxide appears to be formed by the spontaneous decomposition of polonium sulfotrioxide and selenotrioxide.",qs:"Bagnall 1962"},
-  {id:"PoO\u2082", cat:2,si:"po",exp:{s:"proven",     ph:"solid", mk:""},        comp:{s:"comp_reliable",ph:"solid", mk:"mertens"},
+  {id:"PoO\u2082", cat:2,si:"po",exp:{s:"proven",     ph:"solid", mk:""},        comp:{s:"comp_reliable",ph:"assumed_gas",mk:"mertens"},
    q:"This oxide is formed from the elements at 250\u00b0C, its composition being established by measuring the oxygen taken up by the metal. It exists in two crystal modifications, a yellow low temperature form (face-centered cubic) and a red high temperature form (tetragonal).",qs:"Bagnall 1962"},
   {id:"PoO\u2083", cat:2,si:"po",exp:{s:"assumed",    ph:"unknown",mk:""},       comp:{s:"comp_dft",     ph:"decomp",mk:""},
    q:"This compound is said to be formed on the trace scale by the anodic deposition of polonium from an acid solution and, although there is no direct experimental evidence for the composition of the anodic deposit or the presence of a peroxide linkage, the dissolution of the deposit by hydrogen peroxide is certainly suggestive of a higher charge number.",qs:"Bagnall 1962"},
@@ -222,7 +218,7 @@ const M = [
   {id:"PoO\u2084", cat:2,si:"po",exp:{s:"no_data",    ph:"unknown",mk:""},       comp:{s:"comp_dft",     ph:"decomp",mk:""},q:"",qs:""},
   {id:"PoO\u2085", cat:2,si:"po",exp:{s:"no_data",    ph:"unknown",mk:""},       comp:{s:"comp_dft",     ph:"decomp",mk:""},q:"",qs:""},
   {id:"PoO\u2086", cat:2,si:"po",exp:{s:"no_data",    ph:"unknown",mk:""},       comp:{s:"comp_dft",     ph:"decomp",mk:""},q:"",qs:""},
-  {id:"TeO",       cat:2,si:"te",exp:{s:"proven",     ph:"gas",   mk:""},        comp:{s:"comp_reliable",ph:"gas",   mk:"mertens"},
+  {id:"TeO",       cat:2,si:"te",exp:{s:"proven",     ph:"gas",   mk:""},        comp:{s:"comp_reliable",ph:"assumed_gas",mk:"mertens"},
    q:"The vertical and adiabatic electron affinities for TeO are measured as 2.09 \u00b1 0.12 eV and 1.70 \u00b1 0.12 eV, respectively.",qs:"Snodgrass 1989"},
   {id:"TeO\u2082", cat:2,si:"te",exp:{s:"proven",     ph:"solid", mk:""},        comp:{s:"comp_dft",     ph:"unknown",mk:""},q:"",qs:""},
   {id:"TeO\u2083", cat:2,si:"te",exp:{s:"proven",     ph:"solid", mk:""},        comp:{s:"comp_dft",     ph:"unknown",mk:""},
@@ -269,7 +265,7 @@ const M = [
    q:"The six molecules studied in this work are PoH, LiPo, PoO, PbPo, BiPo, and Po\u2082, which were all treated at the CASPT2/SO-CASSI level of theory with ANO-RCC basis sets.",qs:"Mertens 2019"},
   {id:"H\u2082Te",cat:4,si:"te",exp:{s:"proven",     ph:"gas",   mk:""},         comp:{s:"comp_dft",     ph:"decomp", mk:""},
    q:"The gas-phase acidity of hydrogen telluride, \u0394H\u00b0acid (H\u2082Te) = 331.3 \u00b1 0.8 kcal mol\u207b\u00b9, is obtained from ion/molecule reaction equilibria using FT-ICR mass spectrometry.",qs:"Gal et al."},
-  {id:"TeH",     cat:4,si:"te",exp:{s:"proven",      ph:"gas",   mk:""},         comp:{s:"comp_reliable",ph:"gas",    mk:"mertens"},
+  {id:"TeH",     cat:4,si:"te",exp:{s:"proven",      ph:"gas",   mk:""},         comp:{s:"comp_reliable",ph:"assumed_gas",mk:"mertens"},
    q:"Freidhoff et al. have measured the electron affinity of TeH to be EA(TeH) = 2.102 \u00b1 0.015 eV using laser photodetachment threshold measurements on TeH\u207b.",qs:"Snodgrass 1989"},
   // cat 5 Hydroxides
   {id:"Po(OH)",    cat:5,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",     ph:"unknown",mk:""},q:"",qs:""},
@@ -352,7 +348,7 @@ const M = [
 /* ═══ LABEL MAPS ═══ */
 const EXP_LBL  = {proven:"Exp. proven",assumed:"Exp. assumed / inferred",no_data:"No data"};
 const COMP_LBL = {comp_reliable:"SO-CASSI / CASPT2 / CCSD(T)",comp_dft:"DFT (Cottenier group)",comp_unstable:"Computationally unstable",no_data:"No data"};
-const PHASE_LBL= {solid:"Solid",liquid:"Liquid",gas:"Gas",decomp:"Decomposes at MYRRHA T",unknown:"Unknown"};
+const PHASE_LBL= {solid:"Solid",liquid:"Liquid",gas:"Gas",assumed_gas:"Assumed gas",decomp:"Decomposes at MYRRHA T",unknown:"Unknown"};
 const MK_LBL   = {"mertens":"Mertens 2019","mertens_star":"Mertens 2019 (dominant volatile, O\u2082-free cover gas)","koksal":"K\u00f6ksal 2025","koksal_bluestar":"Mertens thesis (dominant outdoor species < 471 K)","bulk":"Bulk solid data only","":"-"};
 const MK_SYM   = {"mertens":{s:"M",c:"#333"},"mertens_star":{s:"\u2605",c:"#c8900a"},"koksal":{s:"K",c:"#333"},"koksal_bluestar":{s:"\u2605",c:"#2980b9"},"bulk":{s:"b",c:"#333"},"":{s:"",c:""}};
 const EXP_CLR  = {proven:{bg:"#a9dfbf",bd:"#1e8449",tx:"#145a32"},assumed:{bg:"#f9e79f",bd:"#d4ac0d",tx:"#7d6608"},no_data:{bg:"#e8e8e8",bd:"#aaaaaa",tx:"#666"}};
@@ -513,7 +509,7 @@ function renderLegend() {
   } else {
     leg.appendChild(mkLegSec('Computational evidence',[
       {bg:'#d6eaf8',bd:'#2980b9',lbl:'SO-CASSI / CASPT2',hatch:false},
-      {bg:'#fdebd0',bd:'#e67e22',lbl:'DFT (Cottenier group)',hatch:true},
+      {bg:'#fdebd0',bd:'#e67e22',lbl:'DFT (Cottenier group)',hatch:false},
       {bg:'#e8e8e8',bd:'#aaaaaa',lbl:'No data'},
     ]));
     const s=document.createElement('div'); s.className='legend-footnote';
