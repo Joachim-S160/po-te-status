@@ -161,7 +161,8 @@ header{text-align:center;margin-bottom:14px}
       <tr><th>Comp. phase</th><td id="mc-phase-comp"></td></tr>
       <tr><th>Exp. ref.</th><td id="mc-ref-exp"></td></tr>
       <tr><th>Comp. ref.</th><td id="mc-ref-comp"></td></tr>
-      <tr id="mc-quote-row" style="display:none"><th style="white-space:normal;padding-right:10px;vertical-align:top">Key quote</th><td id="mc-quote" style="font-style:italic;font-size:.84rem;color:#444;border-left:3px solid #e0e0e0;padding-left:8px"></td></tr>
+      <tr id="mc-quote-row" style="display:none"><th id="mc-quote-label" style="white-space:normal;padding-right:10px;vertical-align:top">Key quote</th><td id="mc-quote" style="font-style:italic;font-size:.84rem;color:#444;border-left:3px solid #e0e0e0;padding-left:8px"></td></tr>
+      <tr id="mc-quote2-row" style="display:none"><th id="mc-quote2-label" style="white-space:normal;padding-right:10px;vertical-align:top">Key quote</th><td id="mc-quote2" style="font-style:italic;font-size:.84rem;color:#444;border-left:3px solid #e0e0e0;padding-left:8px"></td></tr>
       <tr id="mc-qc-row" style="display:none"><th style="white-space:normal;padding-right:10px;vertical-align:top">Quote context</th><td id="mc-qc" style="font-size:.82rem;color:#555;border-left:3px solid #f0c040;padding-left:8px"></td></tr>
     </table>
   </div>
@@ -342,8 +343,10 @@ const M = [
   {id:"TeO(OH)",    cat:6,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"unknown",mk:""},q:"",qs:""},
   {id:"TeO(OH)\u2082",cat:6,si:"te",exp:{s:"assumed",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"unknown",mk:""},
    q:"The results confirm previous findings that a gaseous hydroxide of the formula TeO(OH)\u2082 is formed in the vapour. No indications for the formation of other species have been found.",qs:"Konings 1990",
-   qc:"Konings, Cordfunke & Smit-Groen (1990) used gas-saturation measurements of TeO\u2082 vaporising in steam+O\u2082+Ar mixtures at 876\u2013986\u202fK. The vapor pressure increases linearly with p(H\u2082O), indicating x\u202f=\u202f1 stoichiometry \u2192 TeO(OH)\u2082(g). This is an inference from the vapor pressure slope, not a direct mass spectrometric identification. Temperature range 876\u2013986\u202fK is above the MYRRHA operating range (540\u2013680\u202fK)."},
-  {id:"TeO\u2082(OH)\u2082",cat:6,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"unknown",mk:""},q:"",qs:""},
+   q2:"The only plausible explanation that could account for this observation under these conditions would be accidental ingress of very small amounts of moisture in Exp.\u202fV that could lead to the formation of Te-compounds that are more volatile than TeO\u2082, for example Te oxyhydroxides, such as TeO(OH)\u2082, reported in [29,30].",qs2:"Maugeri & Neuhausen 2014",
+   qc:"Konings, Cordfunke & Smit-Groen (1990): gas-saturation at 876\u2013986\u202fK; vapor pressure slope \u2192 TeO(OH)\u2082(g); inference from stoichiometry, not direct MS; above MYRRHA range (540\u2013680\u202fK). \u2014 Maugeri & Neuhausen (2014): Exp.\u202fV (dried O\u2082): unidentified species at T_dep\u202f=\u202f770\u202f\u00b1\u202f30\u202fK, \u0394H\u2090d\u2093\u202f=\u202f185\u202f\u00b1\u202f10\u202fkJ/mol, \u0394H\u209b\u1d64\u1d47\u2097\u202f=\u202f255\u202f\u00b1\u202f20\u202fkJ/mol on fused silica. [29]\u202f=\u202fKonings\u202f1990, [30]\u202f=\u202fMalinauskas\u202f1970."},
+  {id:"TeO\u2082(OH)\u2082",cat:6,si:"te",exp:{s:"assumed",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"unknown",mk:""},q:"",qs:"",
+   qc:"Maugeri & Neuhausen (2014) explicitly write Eq.\u202f(4): TeO(OH)\u2082\u202f+\u202f0.5\u202fO\u2082\u202f\u21cc\u202fTeO\u2082(OH)\u2082, citing Konings\u202f1990 and Malinauskas\u202f1970. The broad deposition pattern in Exp.\u202fVII/VIII/IX (O\u2082 with increasing moisture) is consistent with multiple oxyhydroxide species that may include TeO\u2082(OH)\u2082. No separate deposition peak or \u0394H\u2090d\u2093 is assigned to it. Species not individually identified; speciation explicitly declared beyond scope of the paper."},
   {id:"TeO\u2082(OH)",cat:6,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"unknown",mk:""},q:"",qs:""},
   {id:"TeO\u2083(OH)",cat:6,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"unknown",mk:""},q:"",qs:""},
   {id:"TeO(OH)\u2083",cat:6,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"unknown",mk:""},q:"",qs:""},
@@ -526,9 +529,20 @@ function openModal(mol) {
   const compRef = mol.comp.mk ? (MK_LBL[mol.comp.mk]||mol.comp.mk) : '-';
   document.getElementById('mc-ref-comp').textContent = compRef;
   const hasQ = mol.q && mol.q.length > 0;
+  const hasQ2 = mol.q2 && mol.q2.length > 0;
   document.getElementById('mc-quote-row').style.display = hasQ ? '' : 'none';
+  document.getElementById('mc-quote2-row').style.display = hasQ2 ? '' : 'none';
+  if (hasQ && hasQ2) {
+    document.getElementById('mc-quote-label').textContent = 'Quote 1 \u2014 ' + (mol.qs || '');
+    document.getElementById('mc-quote2-label').textContent = 'Quote 2 \u2014 ' + (mol.qs2 || '');
+  } else {
+    document.getElementById('mc-quote-label').textContent = 'Key quote';
+  }
   if (hasQ) {
     document.getElementById('mc-quote').textContent = '\u201c' + mol.q + '\u201d';
+  }
+  if (hasQ2) {
+    document.getElementById('mc-quote2').textContent = '\u201c' + mol.q2 + '\u201d';
   }
   const hasQc = mol.qc && mol.qc.length > 0;
   document.getElementById('mc-qc-row').style.display = hasQc ? '' : 'none';
