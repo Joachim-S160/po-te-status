@@ -162,6 +162,7 @@ header{text-align:center;margin-bottom:14px}
       <tr><th>Exp. ref.</th><td id="mc-ref-exp"></td></tr>
       <tr><th>Comp. ref.</th><td id="mc-ref-comp"></td></tr>
       <tr id="mc-quote-row" style="display:none"><th style="white-space:normal;padding-right:10px;vertical-align:top">Key quote</th><td id="mc-quote" style="font-style:italic;font-size:.84rem;color:#444;border-left:3px solid #e0e0e0;padding-left:8px"></td></tr>
+      <tr id="mc-qc-row" style="display:none"><th style="white-space:normal;padding-right:10px;vertical-align:top">Quote context</th><td id="mc-qc" style="font-size:.82rem;color:#555;border-left:3px solid #f0c040;padding-left:8px"></td></tr>
     </table>
   </div>
 </div>
@@ -170,7 +171,7 @@ header{text-align:center;margin-bottom:14px}
 'use strict';
 
 /* ═══ DATA ═══ */
-const CATEGORIES = ["Diatomics","Triatomics","Pure oxides","Bismuth/Lead oxides","Hydrides","Hydroxides","Oxo-hydroxides","Bi/Pb hydrides","Bi/Pb hydroxides","Organics"];
+const CATEGORIES = ["Pure Po/Te","Pure Bismuth/Lead","Pure oxides","Bismuth/Lead oxides","Hydrides","Hydroxides","Oxo-hydroxides","Bi/Pb hydrides","Bi/Pb hydroxides","Organics"];
 const MOSAIC_ROWS = [[0,1],[2],[3],[4,5],[6],[7,8],[9]];
 const SECTION_HEADINGS = [{r:0,l:"No contamination"},{r:1,l:"Oxygen inclusion"},{r:3,l:"Water contamination"},{r:6,l:"Organics"}];
 
@@ -178,38 +179,46 @@ const SECTION_HEADINGS = [{r:0,l:"No contamination"},{r:1,l:"Oxygen inclusion"},
 // exp status: proven|assumed|no_data
 // comp status: comp_reliable|comp_dft|comp_unstable|no_data
 const M = [
-  // cat 0 Diatomics
-  {id:"BiPo",      cat:0,si:"po",exp:{s:"no_data",    ph:"unknown",mk:""},        comp:{s:"comp_reliable",ph:"unknown",mk:"mertens"},
-   q:"The six molecules studied in this work are PoH, LiPo, PoO, PbPo, BiPo, and Po\u2082, which were all treated at the CASPT2/SO-CASSI level of theory with ANO-RCC basis sets.",qs:"Mertens 2019"},
+  // cat 0 Pure Po/Te
   {id:"Po\u2082",  cat:0,si:"po",exp:{s:"proven",     ph:"gas",   mk:""},        comp:{s:"comp_reliable",ph:"assumed_gas",mk:"mertens"},
-   q:"The only Po-containing molecule for which an experimental dissociation energy has been reported is Po\u2082 (1.90 eV) in 1957 by Charles et al.",qs:"Mertens 2019"},
-  {id:"PbPo",      cat:0,si:"po",exp:{s:"proven",     ph:"solid", mk:""},        comp:{s:"comp_reliable",ph:"assumed_gas",mk:"mertens_star"},
-   q:"Zinc polonide sublimes at 400\u00b0C and the silver, lead, and platinum compounds decompose at about 600\u00b0C.",qs:"Bagnall 1962"},
-  {id:"BiTe",      cat:0,si:"te",exp:{s:"proven",     ph:"solid", mk:""},        comp:{s:"comp_reliable",ph:"assumed_gas",mk:"mertens"},
-   q:"Liquid + Bi\u2082Te\u2083 \u2194 BiTe, Reaction temperature 559.5 \u00b0C, Peritectic.",qs:"Drzewowska & Onderka 2023"},
+   q:"Extrapolation of the energy levels to convergence by the use of the above equations yields an estimate of 1.895 volts for the dissociation energy of the lower state of Po\u00b2\u00b9\u2070-Po\u00b2\u00b9\u2070 and of 3.94 volts for the dissociation energy of the upper state of Po-Po, on the assumption that the dissociation products of the lower state are two polonium atoms in the normal state \u00b3P\u2082.",qs:"Charles et al. 1957",
+   qc:"Identification as a diatomic is confirmed by isotope shift analysis: Charles reports bands for Po\u00b2\u2070\u2078-Po\u00b2\u2070\u2078, Po\u00b2\u2070\u2078-Po\u00b2\u2070\u2079, and Po\u00b2\u00b9\u2070-Po\u00b2\u00b9\u2070 combinations. The vibrational frequency scales as \u03c9 \u221d 1/\u221a\u03bc; the observed isotope shifts match the reduced mass formula for n\u202f=\u202f2 (diatomic), ruling out Po\u2083, Po\u2084, etc. Composition (Po only) is established by exclusion \u2014 only polonium is present in the discharge."},
+  {id:"Po\u2083",             cat:0,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""},q:"",qs:""},
   {id:"Te\u2082",  cat:0,si:"te",exp:{s:"proven",     ph:"gas",   mk:""},        comp:{s:"comp_reliable",ph:"assumed_gas",mk:"mertens"},
    q:"The Te\u2082\u207b photoelectron spectrum consists of a structured band extending from approximately 1.6 to 2.5 eV electron kinetic energy... EA(Te\u2082) = 1.92 \u00b1 0.07 eV.",qs:"Snodgrass 1989"},
-  {id:"PbTe",      cat:0,si:"te",exp:{s:"proven",     ph:"solid", mk:""},        comp:{s:"comp_reliable",ph:"assumed_gas",mk:"mertens"},q:"PbTe is a semiconductor with an energy gap of 0.3\u202feV. Its crystal structure is FCC of lattice constant a\u2080=6.5\u00b10.02\u202f\u00c5. The melting point of undoped PbTe is 1190\u202fK for 50\u202fat% Te and has a density of 8.15\u00d710\u00b3\u202fkg\u202fm\u207b\u00b3.",qs:"Dughaish 2002"},
-  // cat 1 Triatomics
-  {id:"Po\u2083",             cat:1,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""},q:"",qs:""},
+  {id:"Te\u2083",             cat:0,si:"te",exp:{s:"assumed",ph:"gas",    mk:""},comp:{s:"no_data",ph:"unknown",mk:""},
+   q:"Te\u2083\u207b has a propensity to photodissociate into Te\u207b and Te\u2082 and probably also into Te\u2082\u207b and Te when irradiated with 2.540-eV photons. These photodissociation processes imply an upper limit of ~2.7\u202feV for the electron affinity of Te\u2083.",qs:"Snodgrass 1989",
+   qc:"Te\u2083\u207b was directly mass-selected via Wien (E\u00d7B) velocity filter from a cold-cathode Penning discharge (Figure\u202f2 shows Te_n\u207b, n\u202f=\u202f1\u20137). EA(Te\u2083) < 2.7\u202feV is an upper limit only, derived from the photodissociation threshold via thermochemical cycle; neutral Te\u2083 was never directly characterized. 'Assumed' status reflects inference of the neutral from the anion."},
+  // cat 1 Pure Bismuth/Lead
+  {id:"BiPo",      cat:1,si:"po",exp:{s:"no_data",    ph:"unknown",mk:""},        comp:{s:"comp_reliable",ph:"unknown",mk:"mertens"},
+   q:"",qs:""},
+  {id:"PbPo",      cat:1,si:"po",exp:{s:"proven",     ph:"solid", mk:""},        comp:{s:"comp_reliable",ph:"assumed_gas",mk:"mertens_star"},
+   q:"PbPo has the NaCl crystal structure with lattice parameter a\u202f=\u202f6.590\u202f\u00c5. The silver, lead, and platinum compounds decompose at about 600\u00b0C.",qs:"Bagnall 1962"},
   {id:"Bi\u2082Po",           cat:1,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""},q:"",qs:""},
+  {id:"BiPbPo",               cat:1,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""},q:"",qs:""},
   {id:"Bi\u2082Po\u2083",     cat:1,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""},q:"",qs:""},
   {id:"Bi\u2087Po\u2083",     cat:1,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""},q:"",qs:""},
-  {id:"BiPbPo",               cat:1,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""},q:"",qs:""},
-  {id:"Te\u2083",             cat:1,si:"te",exp:{s:"assumed",ph:"gas",    mk:""},comp:{s:"no_data",ph:"unknown",mk:""},
-   q:"The absence of significant Te\u2083\u207b photofragmentation near threshold suggests that the Te\u2083\u207b is photodissociating to Te\u2082 + Te\u207b.",qs:"Snodgrass 1989"},
+  {id:"BiTe",      cat:1,si:"te",exp:{s:"proven",     ph:"solid", mk:""},        comp:{s:"comp_reliable",ph:"assumed_gas",mk:"mertens"},
+   q:"Liquid + Bi\u2082Te\u2083 \u2194 BiTe, Reaction temperature 559.5 \u00b0C, Peritectic.",qs:"Drzewowska & Onderka 2023",
+   qc:"BiTe confirmed in both as-cast and long-term equilibrated (30\u201360 day) alloys by XRD (ICDD charts 01-075-1095 and 01-083-1749), EDX (measured composition ~44\u201350 at.\u202f% Te, consistent with 1:1 stoichiometry), and SEM/BEI (dark lamellar grains). The peritectic temperature was measured by DTA at 2 deg/min heating rate."},
+  {id:"PbTe",      cat:1,si:"te",exp:{s:"proven",     ph:"solid", mk:""},        comp:{s:"comp_reliable",ph:"assumed_gas",mk:"mertens"},q:"PbTe is a semiconductor with an energy gap of 0.3\u202feV. Its crystal structure is FCC of lattice constant a\u2080=6.5\u00b10.02\u202f\u00c5. The melting point of undoped PbTe is 1190\u202fK for 50\u202fat% Te and has a density of 8.15\u00d710\u00b3\u202fkg\u202fm\u207b\u00b3.",qs:"Dughaish 2002"},
   {id:"Bi\u2082Te",           cat:1,si:"te",exp:{s:"proven", ph:"solid",  mk:""},comp:{s:"no_data",ph:"unknown",mk:""},
-   q:"Liquid + BiTe \u2194 Bi\u2082Te, Reaction temperature 421.4 \u00b0C, Peritectic.",qs:"Drzewowska & Onderka 2023"},
-  {id:"Bi\u2082Te\u2083",     cat:1,si:"te",exp:{s:"proven", ph:"solid",  mk:""},comp:{s:"no_data",ph:"unknown",mk:""},
-   q:"Liquid \u2194 Bi\u2082Te\u2083, Reaction temperature 584.4 \u00b0C, Congruent melting.",qs:"Drzewowska & Onderka 2023"},
-  {id:"Bi\u2087Te\u2083",     cat:1,si:"te",exp:{s:"proven", ph:"decomp", mk:""},comp:{s:"no_data",ph:"unknown",mk:""},
-   q:"Liquid + Bi\u2082Te \u2194 Bi\u2087Te\u2083, Reaction temperature 316.9 \u00b0C, Peritectic.",qs:"Drzewowska & Onderka 2023"},
+   q:"Liquid + BiTe \u2194 Bi\u2082Te, Reaction temperature 421.4 \u00b0C, Peritectic.",qs:"Drzewowska & Onderka 2023",
+   qc:"Bi\u2082Te confirmed in equilibrated alloys (60-day anneal at 240\u00b0C required) by XRD (ICDD 00-042-0540), EDX (measured ~34\u202fat.\u202f% Te, consistent with 2:1 stoichiometry), and SEM/BEI (single-phase Bi\u2086\u2088Te\u2083\u2082). Bi\u2084Te\u2083, sometimes reported in this composition range, was not detected in equilibrated samples and is considered metastable."},
   {id:"BiPbTe",               cat:1,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""},q:"",qs:""},
+  {id:"Bi\u2082Te\u2083",     cat:1,si:"te",exp:{s:"proven", ph:"solid",  mk:""},comp:{s:"no_data",ph:"unknown",mk:""},
+   q:"Liquid \u2194 Bi\u2082Te\u2083, Reaction temperature 584.4 \u00b0C, Congruent melting.",qs:"Drzewowska & Onderka 2023",
+   qc:"Bi\u2082Te\u2083 confirmed in as-cast (ICDD 01-076-2813) and annealed (01-085-0439) alloys by XRD, EDX (measured ~61\u201362\u202fat.\u202f% Te, consistent with 2:3 stoichiometry), and SEM/BEI (primary solidification phase in Te-rich samples). Congruent melting confirmed by DTA."},
+  {id:"Bi\u2087Te\u2083",     cat:1,si:"te",exp:{s:"proven", ph:"decomp", mk:""},comp:{s:"no_data",ph:"unknown",mk:""},
+   q:"Liquid + Bi\u2082Te \u2194 Bi\u2087Te\u2083, Reaction temperature 316.9 \u00b0C, Peritectic.",qs:"Drzewowska & Onderka 2023",
+   qc:"Bi\u2087Te\u2083 confirmed in equilibrated Bi\u2088\u2080Te\u2082\u2080 alloy by XRD (ICDD 00-012-0719), EDX (measured ~30\u202fat.\u202f% Te, consistent with 7:3 stoichiometry), and SEM/BEI. Kifune et al. (2015) report Bi\u2088Te\u2083 at the same composition; the paper notes this likely reflects a non-stoichiometric homologous phase range."},
   // cat 2 Pure oxides
   {id:"PoO",       cat:2,si:"po",exp:{s:"assumed",    ph:"unknown",mk:""},       comp:{s:"comp_reliable",ph:"assumed_gas",mk:"mertens"},
-   q:"The black monoxide appears to be formed by the spontaneous decomposition of polonium sulfotrioxide and selenotrioxide.",qs:"Bagnall 1962"},
+   q:"The black monoxide appears to be formed by the spontaneous decomposition of polonium sulfotrioxide and selenotrioxide.",qs:"Bagnall 1962",
+   qc:"The word \u2018appears\u2019 in Bagnall\u2019s description reflects genuine uncertainty: PoO is inferred from decomposition products, not directly characterised by spectroscopy or diffraction. This inference is the basis for \u2018Experimentally assumed\u2019 status."},
   {id:"PoO\u2082", cat:2,si:"po",exp:{s:"proven",     ph:"solid", mk:""},        comp:{s:"comp_reliable",ph:"assumed_gas",mk:"mertens"},
-   q:"This oxide is formed from the elements at 250\u00b0C, its composition being established by measuring the oxygen taken up by the metal. It exists in two crystal modifications, a yellow low temperature form (face-centered cubic) and a red high temperature form (tetragonal).",qs:"Bagnall 1962"},
+   q:"This oxide is formed from the elements at 250\u00b0C, its composition being established by measuring the oxygen taken up by the metal. It exists in two crystal modifications, a yellow low temperature form (face-centered cubic) and a red high temperature form (tetragonal).",qs:"Bagnall 1962",
+   qc:"The composition (PoO\u2082) was established by measuring oxygen uptake by polonium metal, a stoichiometric method only. The primary structural evidence is the identification of two crystal polymorphs with defined crystal systems (yellow face-centred cubic; red tetragonal), which requires X-ray diffraction characterisation. It is the crystallographic evidence that justifies \u2018Experimentally proven\u2019 status."},
   {id:"PoO\u2083", cat:2,si:"po",exp:{s:"assumed",    ph:"unknown",mk:""},       comp:{s:"comp_dft",     ph:"decomp",mk:""},
    q:"This compound is said to be formed on the trace scale by the anodic deposition of polonium from an acid solution and, although there is no direct experimental evidence for the composition of the anodic deposit or the presence of a peroxide linkage, the dissolution of the deposit by hydrogen peroxide is certainly suggestive of a higher charge number.",qs:"Bagnall 1962"},
   {id:"Po\u2082O\u2085",cat:2,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},     comp:{s:"no_data",      ph:"unknown",mk:""},q:"",qs:""},
@@ -221,12 +230,14 @@ const M = [
   {id:"TeO",       cat:2,si:"te",exp:{s:"proven",     ph:"gas",   mk:""},        comp:{s:"comp_reliable",ph:"assumed_gas",mk:"mertens"},
    q:"The vertical and adiabatic electron affinities for TeO are measured as 2.09 \u00b1 0.12 eV and 1.70 \u00b1 0.12 eV, respectively.",qs:"Snodgrass 1989"},
   {id:"TeO\u2082", cat:2,si:"te",exp:{s:"proven",     ph:"solid", mk:""},        comp:{s:"comp_dft",     ph:"unknown",mk:""},
-   q:"According to Prescher and Schr\u00f6dter[13] and Mezaki and Margrave,[14] the melting point of TeO2 is close to 1006\u202fK, both measured the temperature during drop calorimetry studies.",
-   qs:"Goss\u00e9 2025, p.\u202f2"},
+   q:"From the data around the melting point of TeO\u2082, 1006\u00b0K., one can determine the heat of fusion as 6.95 \u00b1 0.10 kcal./mole.",qs:"Mezaki & Margrave 1962",
+   qc:"Drop-type calorimeter study measuring heat contents of spectroscopically pure TeO\u2082 in gold capsules over 446\u20131146\u202fK. XRD confirmed phase purity ('only TeO\u2082 showed in the X-ray pattern'). Note: under argon atmosphere, TeO\u2082 partially disproportionates at high temperature via TeO to elementary Te; later runs performed under O\u2082 to suppress this."},
   {id:"TeO\u2083", cat:2,si:"te",exp:{s:"proven",     ph:"solid", mk:""},        comp:{s:"comp_dft",     ph:"unknown",mk:""},
-   q:"It appears to be a reasonable consensus that H\u2082TeO\u2084, TeO\u2083 and Te\u2082O\u2085 occur as intermediates of this degradation [of H\u2086TeO\u2086], and that TeO\u2082 is the final oxide product.",qs:"Ahmed 2000"},
+   q:"TeO\u2083\u202f(I) crystallizes in space group R3\u0305c\u2026 The present values for the structural variables a, \u03b1 and x give 191.8(3)\u202fpm for the Te\u2013O bond, 357.32(1)\u202fpm for the shortest interatomic Te\u00b7\u00b7\u00b7Te distance and 89.05(7)\u00b0 and 137.4(4)\u00b0 for the angles O\u2013Te\u2013O and Te\u2013O\u2013Te, respectively.",qs:"Ahmed et\u202fal. 2000, p.\u202f4547",
+   qc:"Three crystalline polymorphs (I, II, III) and an amorphous form of TeO\u2083 are characterized by powder XRD and TG/DTA. The crystal structure of TeO\u2083\u202f(I) was redetermined by Rietveld refinement of powder X-ray diffraction data (R(F\u00b2)\u202f=\u202f0.095) \u2014 full structure determination, not just phase identification. TG mass-loss data independently confirm composition for all polymorphs (observed vs. calculated \u0394m/m\u2080 in close agreement). XRD is reliable here; \u2018Experimentally proven\u2019 status is fully justified."},
   {id:"Te\u2082O\u2085",cat:2,si:"te",exp:{s:"proven",ph:"solid", mk:""},       comp:{s:"no_data",      ph:"unknown",mk:""},
-   q:"At constant temperature the onset of the thermal decomposition of Te\u2082O\u2085 to TeO\u2082 is listed at 500-520 \u00b0C, the decomposition rate being appreciable at 595 \u00b0C.",qs:"Ahmed 2000"},
+   q:"Thermal decomposition of H\u2086TeO\u2086 or TeO\u2083 at 400\u2013450\u00b0C is said to give Te\u2082O\u2085, and suitable single crystals for structure determination have been obtained (together with TeO\u2083) hydrothermally from H\u2086TeO\u2086 and water.",qs:"Ahmed et\u202fal. 2000, p.\u202f4542",
+   qc:"Ahmed 2000 characterizes two crystalline polymorphs (I: monoclinic; II: triclinic, with caveat \u2018formula may be slightly approximate\u2019) by powder XRD with unit cell parameters, plus an amorphous form; TG mass-loss data confirm composition. The crystal structure of Te\u2082O\u2085 was solved from single crystals in the reference cited [26]. \u2018Proven\u2019 status rests on the single crystal structure determination (ref.\u202f26) and TG composition confirmation in Ahmed; PXD unit cells provide additional supporting evidence."},
   {id:"Te\u2082O\u2082",cat:2,si:"te",exp:{s:"assumed",ph:"gas",  mk:""},       comp:{s:"no_data",      ph:"unknown",mk:""},q:"Thermochemical data for Te\u2082O\u2082(g) appear in Barin (1995) p.\u00a01492 under reference code \u2018Mi1\u2019, but the original experimental source has not been identified. No direct spectroscopic or mass spectrometric detection of Te\u2082O\u2082 as a molecular species has been found.",qs:"Barin 1995"},
   {id:"Te\u2084O\u2089",cat:2,si:"te",exp:{s:"proven",ph:"solid", mk:""},       comp:{s:"no_data",      ph:"unknown",mk:""},
    q:"The onset of the thermal decomposition of Te\u2084O\u2089 is listed at some 500 \u00b0C, and the final product obtained at 650 \u00b0C is phase-pure TeO\u2082.",qs:"Ahmed 2000"},
@@ -503,6 +514,11 @@ function openModal(mol) {
   document.getElementById('mc-quote-row').style.display = hasQ ? '' : 'none';
   if (hasQ) {
     document.getElementById('mc-quote').textContent = '\u201c' + mol.q + '\u201d';
+  }
+  const hasQc = mol.qc && mol.qc.length > 0;
+  document.getElementById('mc-qc-row').style.display = hasQc ? '' : 'none';
+  if (hasQc) {
+    document.getElementById('mc-qc').textContent = mol.qc;
   }
   document.getElementById('modal-overlay').style.display='flex';
   document.getElementById('modal-close').focus();
