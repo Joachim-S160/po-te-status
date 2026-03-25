@@ -189,7 +189,7 @@ const M = [
    q:"Liquid + Bi\u2082Te\u2083 \u2194 BiTe, Reaction temperature 559.5 \u00b0C, Peritectic.",qs:"Drzewowska & Onderka 2023"},
   {id:"Te\u2082",  cat:0,si:"te",exp:{s:"proven",     ph:"gas",   mk:""},        comp:{s:"comp_reliable",ph:"assumed_gas",mk:"mertens"},
    q:"The Te\u2082\u207b photoelectron spectrum consists of a structured band extending from approximately 1.6 to 2.5 eV electron kinetic energy... EA(Te\u2082) = 1.92 \u00b1 0.07 eV.",qs:"Snodgrass 1989"},
-  {id:"PbTe",      cat:0,si:"te",exp:{s:"proven",     ph:"solid", mk:""},        comp:{s:"comp_reliable",ph:"assumed_gas",mk:"mertens"},q:"",qs:""},
+  {id:"PbTe",      cat:0,si:"te",exp:{s:"proven",     ph:"solid", mk:""},        comp:{s:"comp_reliable",ph:"assumed_gas",mk:"mertens"},q:"PbTe is a semiconductor with an energy gap of 0.3\u202feV. Its crystal structure is FCC of lattice constant a\u2080=6.5\u00b10.02\u202f\u00c5. The melting point of undoped PbTe is 1190\u202fK for 50\u202fat% Te and has a density of 8.15\u00d710\u00b3\u202fkg\u202fm\u207b\u00b3.",qs:"Dughaish 2002"},
   // cat 1 Triatomics
   {id:"Po\u2083",             cat:1,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""},q:"",qs:""},
   {id:"Bi\u2082Po",           cat:1,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""},q:"",qs:""},
@@ -220,7 +220,9 @@ const M = [
   {id:"PoO\u2086", cat:2,si:"po",exp:{s:"no_data",    ph:"unknown",mk:""},       comp:{s:"comp_dft",     ph:"decomp",mk:""},q:"",qs:""},
   {id:"TeO",       cat:2,si:"te",exp:{s:"proven",     ph:"gas",   mk:""},        comp:{s:"comp_reliable",ph:"assumed_gas",mk:"mertens"},
    q:"The vertical and adiabatic electron affinities for TeO are measured as 2.09 \u00b1 0.12 eV and 1.70 \u00b1 0.12 eV, respectively.",qs:"Snodgrass 1989"},
-  {id:"TeO\u2082", cat:2,si:"te",exp:{s:"proven",     ph:"solid", mk:""},        comp:{s:"comp_dft",     ph:"unknown",mk:""},q:"",qs:""},
+  {id:"TeO\u2082", cat:2,si:"te",exp:{s:"proven",     ph:"solid", mk:""},        comp:{s:"comp_dft",     ph:"unknown",mk:""},
+   q:"According to Prescher and Schr\u00f6dter[13] and Mezaki and Margrave,[14] the melting point of TeO2 is close to 1006\u202fK, both measured the temperature during drop calorimetry studies.",
+   qs:"Goss\u00e9 2025, p.\u202f2"},
   {id:"TeO\u2083", cat:2,si:"te",exp:{s:"proven",     ph:"solid", mk:""},        comp:{s:"comp_dft",     ph:"unknown",mk:""},
    q:"It appears to be a reasonable consensus that H\u2082TeO\u2084, TeO\u2083 and Te\u2082O\u2085 occur as intermediates of this degradation [of H\u2086TeO\u2086], and that TeO\u2082 is the final oxide product.",qs:"Ahmed 2000"},
   {id:"Te\u2082O\u2085",cat:2,si:"te",exp:{s:"proven",ph:"solid", mk:""},       comp:{s:"no_data",      ph:"unknown",mk:""},
@@ -247,11 +249,17 @@ const M = [
   {id:"PbTeO\u2083",         cat:3,si:"te",exp:{s:"proven", ph:"solid", mk:"bulk"},comp:{s:"no_data",ph:"unknown",mk:""},
    q:"Therefore, it can be concluded that Pb\u2082TeO\u2084\u207a and PbTeO\u2083\u207a are parent ions, formed by the ionisation of Pb\u2082TeO\u2084(g) and PbTeO\u2083(g).",qs:"Kunkel 2015"},
   {id:"PbTeO\u2084",         cat:3,si:"te",exp:{s:"assumed",ph:"solid", mk:"bulk"},comp:{s:"no_data",ph:"unknown",mk:""},q:"Listed in Berchenko (2014) Table\u00a01 (p.\u00a065) with note \u2018calculated value\u2019 \u2014 no direct XRD, MS, or NMR characterization of PbTeO\u2084 has been found. The compound is inferred from phase diagram thermodynamics only.",qs:"Berchenko 2014"},
-  {id:"Pb\u2082Te\u2083O\u2088",cat:3,si:"te",exp:{s:"proven",ph:"solid",mk:"bulk"},comp:{s:"no_data",ph:"unknown",mk:""},q:"",qs:""},
+  {id:"Pb\u2082Te\u2083O\u2088",cat:3,si:"te",exp:{s:"proven",ph:"solid",mk:"bulk"},comp:{s:"no_data",ph:"unknown",mk:""},
+   q:"At 773\u202fK (Fig.\u202f3b) the phase equilibrium diagram changes dramatically: the oxides Pb2O3 and TeO3 disappear, on the other hand the ternary oxides Pb2Te3O8; Pb2TeO4; Pb3TeO5; and Pb5TeO7 are arising.",
+   qs:"Berchenko et\u202fal. 2014, p.\u202f66"},
   {id:"Pb\u2082TeO\u2084",   cat:3,si:"te",exp:{s:"proven", ph:"solid", mk:"bulk"},comp:{s:"no_data",ph:"unknown",mk:""},
    q:"Therefore, it can be concluded that Pb\u2082TeO\u2084\u207a and PbTeO\u2083\u207a are parent ions, formed by the ionisation of Pb\u2082TeO\u2084(g) and PbTeO\u2083(g).",qs:"Kunkel 2015"},
-  {id:"Pb\u2083TeO\u2085",   cat:3,si:"te",exp:{s:"proven", ph:"solid", mk:"bulk"},comp:{s:"no_data",ph:"unknown",mk:""},q:"",qs:""},
-  {id:"Pb\u2085TeO\u2087",   cat:3,si:"te",exp:{s:"proven", ph:"solid", mk:"bulk"},comp:{s:"no_data",ph:"unknown",mk:""},q:"",qs:""},
+  {id:"Pb\u2083TeO\u2085",   cat:3,si:"te",exp:{s:"proven", ph:"solid", mk:"bulk"},comp:{s:"no_data",ph:"unknown",mk:""},
+   q:"Further temperature increase resulted only in the appearance of Pb3TeO5 instead of a Pb5TeO7.",
+   qs:"Berchenko et\u202fal. 2014, p.\u202f68 (XRD, citing Chen et\u202fal. 1997)"},
+  {id:"Pb\u2085TeO\u2087",   cat:3,si:"te",exp:{s:"proven", ph:"solid", mk:"bulk"},comp:{s:"no_data",ph:"unknown",mk:""},
+   q:"At the lowest oxidation temperature (723\u202fK), they detected the presence of PbTeO3 in the entire range of oxygen pressures and of Pb5TeO7 at lowest pressures of oxygen.",
+   qs:"Berchenko et\u202fal. 2014, p.\u202f68 (XRD, citing Chen et\u202fal. 1997)"},
   {id:"PbTe\u2082O\u2085",   cat:3,si:"te",exp:{s:"proven", ph:"unknown", mk:""},   comp:{s:"no_data",ph:"unknown",mk:""},
    q:"The formation of four hitherto unknown lead tellurium oxides - PbTeO\u2083, PbTe\u2082O\u2085, Pb\u2082TeO\u2084 and Pb\u2082Te\u2082O\u2086 - was observed in the gas phase.",qs:"Kunkel 2015"},
   {id:"Pb\u2082Te\u2082O\u2086",cat:3,si:"te",exp:{s:"proven",ph:"unknown",mk:""},  comp:{s:"no_data",ph:"unknown",mk:""},
@@ -292,7 +300,7 @@ const M = [
   {id:"Te(OH)\u2085",cat:5,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",   ph:"unknown",mk:""},q:"",qs:""},
   {id:"Te(OH)\u2086",cat:5,si:"te",exp:{s:"proven", ph:"unknown",mk:""},comp:{s:"comp_reliable",ph:"unknown",mk:"koksal"},
    q:"Orthotelluric acid (monoclinic modification) begins to decompose at 140\u00b0 with liberation of water, the last portion of which escapes as late as immediately before the crystallization of the product to form Te\u2082O\u2085. Oxygen begins to escape at 305\u00b0 and is liberated in three waves, with maxima at 370, 455 and 560\u00b0.",qs:"F\u00e1bry, Loub &amp; Feltl 1982, p.\u00a097"},
-  {id:"TeO\u2084H\u2082",cat:5,si:"te",exp:{s:"proven",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"unknown",mk:""},q:"",qs:""},
+  {id:"TeO\u2084H\u2082",cat:5,si:"te",exp:{s:"proven",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"unknown",mk:""},q:"The hitherto unreported TeO\u2083\u00b7xH\u2082O (x\u202f=\u202f1.37\u20131.58) was obtained in crystalline form in syntheses with ca.\u202f65\u201375\u202fwt% H\u2082SO\u2084 at 150\u2013190\u202f\u00b0C and in an amorphous form with 95\u202fwt% H\u2082SO\u2084 at ca.\u202f135\u202f\u00b0C.",qs:"Ahmed et al. 2000, p.\u00a04544"},
   // cat 6 Oxo-hydroxides
   {id:"PoO(OH)",    cat:6,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"unknown",mk:""},q:"",qs:""},
   {id:"PoO(OH)\u2082",cat:6,si:"po",exp:{s:"assumed",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"unknown",mk:""},
@@ -324,8 +332,12 @@ const M = [
   {id:"TeO\u2085(OH)",cat:6,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"decomp",mk:""},q:"",qs:""},
   {id:"TeO\u2084(OH)\u2082",cat:6,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"decomp",mk:""},q:"",qs:""},
   {id:"TeO\u2083(OH)\u2083",cat:6,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"unknown",mk:""},q:"",qs:""},
-  {id:"TeO\u2082(OH)\u2084",cat:6,si:"te",exp:{s:"proven", ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"unknown",mk:""},q:"",qs:""},
-  {id:"TeO(OH)\u2085",cat:6,si:"te",exp:{s:"proven", ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"unknown",mk:""},q:"",qs:""},
+  {id:"TeO\u2082(OH)\u2084",cat:6,si:"te",exp:{s:"proven", ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"unknown",mk:""},
+   q:"Colorless, block-shaped crystals of the oxohydroxotellurate(VI) K\u2082[TeO\u2082(OH)\u2084] were synthesized from (NH\u2084)\u2082TeO\u2084 in a KOH hydroflux at 200\u202f\u00b0C. In the triclinic crystal structure, [TeO\u2082(OH)\u2084]\u00b2\u207b octahedra are connected via hydrogen bonds to form layers, which are separated from each other by potassium cations.",
+   qs:"He\u202fet\u202fal. 2023, abstract"},
+  {id:"TeO(OH)\u2085",cat:6,si:"te",exp:{s:"proven", ph:"unknown",mk:""},comp:{s:"comp_dft",ph:"unknown",mk:""},
+   q:"Among them, K[TeO(OH)\u2085]\u00b7H\u2082O, published by Raman in 1964, is the only one that also has only isolated tellurium(VI)-centered octahedra. The Te\u2212O bond lengths (184.3 to 202.2\u202fpm) and shortest Te\u00b7\u00b7\u00b7Te distances are very similar to those in K\u2082[TeO\u2082(OH)\u2084]. Unfortunately, the hydrogen bonds in K[TeO(OH)\u2085]\u00b7H\u2082O cannot be identified for a comparison, because the hydrogen atoms have not been localized.",
+   qs:"He\u202fet\u202fal. 2023, p.\u202f3"},
   // cat 7 Bi/Pb hydrides
   {id:"BiPoH",cat:7,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""},q:"",qs:""},
   {id:"PbPoH",cat:7,si:"po",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""},q:"",qs:""},
@@ -342,12 +354,14 @@ const M = [
   {id:"Po(C\u2086H\u2085)\u2082",cat:9,si:"po",exp:{s:"assumed",ph:"decomp", mk:""},comp:{s:"no_data",ph:"unknown",mk:""},
    q:"Even the 'stable' organic polonium compounds charred rapidly due to the intense alpha radiation.",qs:"Bagnall 1962"},
   {id:"Te(C\u2082O\u2084)\u2082",cat:9,si:"te",exp:{s:"no_data",ph:"unknown",mk:""},comp:{s:"no_data",ph:"unknown",mk:""},q:"",qs:""},
-  {id:"Te(C\u2086H\u2085)\u2082",cat:9,si:"te",exp:{s:"proven", ph:"decomp", mk:""},comp:{s:"no_data",ph:"unknown",mk:""},q:"",qs:""},
+  {id:"Te(C\u2086H\u2085)\u2082",cat:9,si:"te",exp:{s:"proven", ph:"decomp", mk:""},comp:{s:"no_data",ph:"unknown",mk:""},
+   q:"Nach zwei- bis dreimaliger Rectification erscheint das Diphenyltellurid als helles Oel, das unter 10\u202fmm gegen 174\u00b0, unter 16.5\u202fmm bei 182 bis 183\u00b0 \u00fcbergeht. Unter gew\u00f6hnlichem Druck siedet das Tellurid unter Zersetzung bei 312\u2013320\u00b0, indem Benzol und eine hellgl\u00e4nzende Krystallmasse entstehen.",
+   qs:"Kraft 1894, p.\u202f1769"},
 ];
 
 /* ═══ LABEL MAPS ═══ */
 const EXP_LBL  = {proven:"Exp. proven",assumed:"Exp. assumed / inferred",no_data:"No data"};
-const COMP_LBL = {comp_reliable:"SO-CASSI / CASPT2 / CCSD(T)",comp_dft:"DFT (Cottenier group)",comp_unstable:"Computationally unstable",no_data:"No data"};
+const COMP_LBL = {comp_reliable:"MS-CASPT2 + SO-CASSI",comp_dft:"DFT (Cottenier group)",comp_unstable:"Computationally unstable",no_data:"No data"};
 const PHASE_LBL= {solid:"Solid",liquid:"Liquid",gas:"Gas",assumed_gas:"Assumed gas",decomp:"Decomposes at MYRRHA T",unknown:"Unknown"};
 const MK_LBL   = {"mertens":"Mertens 2019","mertens_star":"Mertens 2019 (dominant volatile, O\u2082-free cover gas)","koksal":"K\u00f6ksal 2025","koksal_bluestar":"Mertens thesis (dominant outdoor species < 471 K)","bulk":"Bulk solid data only","":"-"};
 const MK_SYM   = {"mertens":{s:"M",c:"#333"},"mertens_star":{s:"\u2605",c:"#c8900a"},"koksal":{s:"K",c:"#333"},"koksal_bluestar":{s:"\u2605",c:"#2980b9"},"bulk":{s:"b",c:"#333"},"":{s:"",c:""}};
